@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+  <persistence-unit name="MediaRepository" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <non-jta-data-source>mediadb</non-jta-data-source>
+    <class>de.gisdesign.nas.media.domain.image.ImageFileData</class>
+    <class>de.gisdesign.nas.media.domain.image.ImageTag</class>
+    <class>de.gisdesign.nas.media.admin.MediaFileRootDirectory</class>
+    <class>de.gisdesign.nas.media.admin.MediaRepositoryConfigurationParameter</class>
+    <validation-mode>NONE</validation-mode>
+    <properties>
+      <property name="hibernate.hbm2ddl.auto" value="update"/>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
+      <property name="hibernate.id.new_generator_mappings" value="true" />
+    </properties>
+  </persistence-unit>
+</persistence>

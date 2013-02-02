@@ -1,0 +1,2 @@
+# the format is <mime type> <space separated file extensions>
+image/jpeg jpeg jpg jpe JPEG JPG JPE
