@@ -54,6 +54,6 @@ final class ImageMonthCriteria implements MetaDataQueryBuilder {
 
     @Override
     public Expression<?> buildExpression(CriteriaBuilder cb, Root<?> root) {
-        return cb.function("month", Integer.class, root.get("imageMetaData").get("creationDate"));
+        return cb.function("month", Integer.class, root.get("metaData").get("creationDate"));
     }
 }

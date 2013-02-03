@@ -48,13 +48,13 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
     private static final Logger LOG = LoggerFactory.getLogger(ImageMediaRepositoryImpl.class);
 
     @Autowired
-    private ConfigurationService administrationService;
+    private ConfigurationService configService;
 
     @Autowired
     private MediaFileLibraryManager mediaFileLibraryManager;
 
     @Autowired
-    private ImageRepositoryDAO mediaRepositoryDAO;
+    private ImageRepositoryDAO imageRepositoryDAO;
 
     @Autowired
     private ThumbGenerator thumbGenerator;
@@ -80,34 +80,28 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
         Validate.notNull(mediaFileData, "MediaFileData is null.");
         Validate.isTrue(ImageFileData.class.isAssignableFrom(mediaFileData.getClass()), "MediaFileData is not of type ImageFileData.");
         ImageFileData imageData = mediaFileData;
-        return new ImageCatalogEntry(parent, imageData);
+        File imageFile = new File(imageData.getAbsolutePath(), imageData.getFilename());
+        return imageFile.exists() ? new ImageCatalogEntry(parent, imageData) : null;
     }
 
     @Override
     public ImageFileData loadMediaFileData(File imageFile) {
         validateMediaFile(imageFile);
-        return mediaRepositoryDAO.findImageByAbsoluteFileName(imageFile.getAbsolutePath());
+        return imageRepositoryDAO.findImageByAbsoluteFileName(imageFile.getAbsolutePath());
     }
 
     @Transactional
     @Override
     public ImageFileData createMediaFileData(File imageFile) throws MediaFileScanException {
-        return createMediaFileData(imageFile, null);
-    }
-
-    @Transactional
-    @Override
-    public ImageFileData createMediaFileData(File imageFile, Long syncId) throws MediaFileScanException {
         validateMediaFile(imageFile);
         ImageFileData imageData;
         if (isSupportedMediaFile(imageFile)) {
             imageData = new ImageFileData();
-            imageData.setSyncId(syncId);
             imageData.setAbsolutePath(imageFile.getParent());
             imageData.setFilename(imageFile.getName());
             imageData.setLastModified(imageFile.lastModified());
             scanImageFileMetaData(imageFile, imageData);
-            imageData = mediaRepositoryDAO.saveImage(imageData);
+            imageData = imageRepositoryDAO.saveImage(imageData);
         } else {
             throw new MediaFileScanException("Unsupported Image media file [" + imageFile.getAbsolutePath() + "]");
         }
@@ -116,7 +110,7 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
 
     @Transactional
     @Override
-    public ImageFileData updateMediaFileData(ImageFileData mediaFileData, Long syncId) throws MediaFileScanException {
+    public ImageFileData updateMediaFileData(ImageFileData mediaFileData) throws MediaFileScanException {
         File imageFile = new File(mediaFileData.getAbsolutePath(), mediaFileData.getFilename());
         //Only rescan meta data if timestamp has changed.
         if (mediaFileData.hasChanged(imageFile.lastModified())) {
@@ -124,16 +118,21 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
             mediaFileData.setLastModified(imageFile.lastModified());
         }
         //Update sync ID and store metadata.
-        mediaFileData.setSyncId(syncId);
-        ImageFileData updatedImageFileData = mediaRepositoryDAO.saveImage(mediaFileData);
+        ImageFileData updatedImageFileData = imageRepositoryDAO.saveImage(mediaFileData);
         return updatedImageFileData;
+    }
+
+    @Transactional
+    @Override
+    public void deleteMediaFileData(ImageFileData mediaFileData) {
+        imageRepositoryDAO.deleteImage(mediaFileData);
     }
 
     @Override
     public Map<String,ImageFileData> loadMediaFilesFromDirectory(File directory) {
         validateMediaFileDirectory(directory);
         Map<String,ImageFileData> mediaFileDataMap = new HashMap<String, ImageFileData>();
-        List<ImageFileData> mediaFileDataList = mediaRepositoryDAO.findImagesByDirectory(directory.getAbsolutePath());
+        List<ImageFileData> mediaFileDataList = imageRepositoryDAO.findImagesByDirectory(directory.getAbsolutePath());
         LOG.debug("Loaded {} MediaFileData for media files in directory [{}].", mediaFileDataList.size(), directory.getAbsolutePath());
         for (ImageFileData mediaFileData : mediaFileDataList) {
             mediaFileDataMap.put(mediaFileData.getFilename(), mediaFileData);
@@ -150,12 +149,15 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
 
     @Override
     public List<ImageFileData> findMediaFilesByCriteria(MetaDataCriteria criteria) {
-        return mediaRepositoryDAO.findImagesByCriteria(criteria);
+        List<ImageFileData> imageFiles = imageRepositoryDAO.findImagesByCriteria(criteria);
+        LOG.debug("Loaded [{}] Image files for MetaDataCriteria [{}]", imageFiles.size(), criteria.dumpHierarchy());
+        return imageFiles;
     }
 
     @Override
     public List<MetaDataCriteria> loadMetaDataCriteriaOptions(MetaDataCriteria criteria) {
-        List<String> criteriaValues = mediaRepositoryDAO.loadImageCriteriaValues(criteria);
+        List<String> criteriaValues = imageRepositoryDAO.loadImageCriteriaValues(criteria);
+        LOG.debug("Loaded MetaDataCriteriaValues {} for MetaDataCriteria [{}]", criteriaValues, criteria.dumpHierarchy());
         List<MetaDataCriteria> criteriaChildren = new ArrayList<MetaDataCriteria>(criteriaValues.size());
         for (String value : criteriaValues) {
             MetaDataCriteria newMetaDataCriteria = new MetaDataCriteria(criteria.getMediaFileType(), criteria.getName());
@@ -169,13 +171,6 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
             criteriaChildren.add(newMetaDataCriteria);
         }
         return criteriaChildren;
-    }
-
-    @Transactional
-    @Override
-    public void deleteOrphanedMediaFiles(Long syncId) {
-        Validate.notNull(syncId, "Synchronization ID is null.");
-        mediaRepositoryDAO.deleteOrphanedImages(syncId);
     }
 
     @Override
@@ -214,9 +209,15 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
         int index = 0;
         boolean finished = false;
         while (!finished)  {
-            List<ImageFileData> imageDataList = mediaRepositoryDAO.findImagesForRescaling(index, batchSize);
+            List<ImageFileData> imageDataList = imageRepositoryDAO.findImagesForRescaling(index, batchSize);
             for (ImageFileData imageData : imageDataList) {
-                count += thumbGenerator.generateScaledImages(imageData, outputDirectory, slideShowHeight, thumbSizeBig, thumbSizeSmall);
+                File imageFile = new File(imageData.getAbsolutePath(), imageData.getFilename());
+                if (imageFile.exists()) {
+                    count += thumbGenerator.generateScaledImages(imageData, outputDirectory, slideShowHeight, thumbSizeBig, thumbSizeSmall);
+                } else {
+                    LOG.debug("Removing non-existent image file [{}] in directory [{}].", imageData.getFilename(), imageData.getAbsolutePath());
+                    imageRepositoryDAO.deleteImage(imageData);
+                }
             }
             finished |= imageDataList.size() < batchSize;
             index += batchSize;
@@ -292,16 +293,16 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
 
     private File determineOutputDirectory() {
         //Load configuration for output directory of rescaled images.
-        String rescaleDirectory = administrationService.getConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_RESCALED_IMAGE_DIRECTORY);
+        String rescaleDirectory = configService.getConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_RESCALED_IMAGE_DIRECTORY);
         if (rescaleDirectory == null)  {
             rescaleDirectory = (String) getDefault(CONFIG_PARAM_RESCALED_IMAGE_DIRECTORY);
-            administrationService.setConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_RESCALED_IMAGE_DIRECTORY, rescaleDirectory);
+            configService.setConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_RESCALED_IMAGE_DIRECTORY, rescaleDirectory);
         }
         File outputDirectory = new File(rescaleDirectory);
         if (!outputDirectory.exists() || !outputDirectory.isDirectory() || !outputDirectory.canWrite())  {
             LOG.error("Invalid output directory [{}] for rescaling iamges.", rescaleDirectory);
             rescaleDirectory = (String) getDefault(CONFIG_PARAM_RESCALED_IMAGE_DIRECTORY);
-            administrationService.setConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_RESCALED_IMAGE_DIRECTORY, rescaleDirectory);
+            configService.setConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_RESCALED_IMAGE_DIRECTORY, rescaleDirectory);
         }
         return outputDirectory;
     }
@@ -309,7 +310,7 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
     private Integer determineSlideShowImageHeight() {
         //Load configuration for slide show image size.
         Integer slideShowHeight = null;
-        String slideShowHeightValue = administrationService.getConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_SLIDE_SHOW_SIZE);
+        String slideShowHeightValue = configService.getConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_SLIDE_SHOW_SIZE);
         try {
             slideShowHeight = (slideShowHeightValue != null) ? new Integer(slideShowHeightValue) : null;
         } catch (NumberFormatException ex) {
@@ -317,7 +318,7 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
         }
         if (slideShowHeight == null)  {
             slideShowHeight = (Integer) getDefault(CONFIG_PARAM_SLIDE_SHOW_SIZE);
-            administrationService.setConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_SLIDE_SHOW_SIZE, String.valueOf(slideShowHeight));
+            configService.setConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_SLIDE_SHOW_SIZE, String.valueOf(slideShowHeight));
         }
         return slideShowHeight;
     }

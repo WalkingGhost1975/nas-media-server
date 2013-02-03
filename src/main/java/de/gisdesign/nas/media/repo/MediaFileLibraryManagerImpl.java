@@ -36,10 +36,11 @@ public class MediaFileLibraryManagerImpl implements MediaFileLibraryManager {
         Validate.notNull(libraryName, "Library name is null.");
         MediaFileLibraryEntity mediaFileLibrary = loadMediaFileLibrary(mediaType, libraryName);
         if (mediaFileLibrary != null)  {
-            LOG.warn("MediaFileLibrary for MediaFileType [{}] with name [{}] already exists", mediaType, libraryName);
+            LOG.warn("MediaFileLibrary [{}] for MediaFileType [{}] already exists", libraryName, mediaType);
         } else {
             mediaFileLibrary = new MediaFileLibraryEntity(mediaType, libraryName);
             em.persist(mediaFileLibrary);
+            LOG.info("Created MediaFileLibrary [{}] for MediaFileType [{}]", libraryName, mediaType);
         }
         return mediaFileLibrary;
     }
@@ -50,6 +51,7 @@ public class MediaFileLibraryManagerImpl implements MediaFileLibraryManager {
         MediaFileLibraryEntity mediaFileLibrary = loadMediaFileLibrary(mediaType, libraryName);
         if (mediaFileLibrary != null)  {
             em.remove(mediaFileLibrary);
+            LOG.info("Deleted MediaFileLibrary [{}] for MediaFileType [{}]", libraryName, mediaType);
         }
     }
 
@@ -58,7 +60,9 @@ public class MediaFileLibraryManagerImpl implements MediaFileLibraryManager {
         Validate.notNull(mediaType, "MediaFileType is null.");
         TypedQuery<String> query = em.createQuery("SELECT mfl.name FROM MediaFileLibraryEntity mfl WHERE mfl.mediaFileType=?1", String.class);
         query.setParameter(1, mediaType);
-        return query.getResultList();
+        List<String> libraryNames = query.getResultList();
+        LOG.debug("Loaded MediaFileLibrary names {} for MediaFileType [{}]", libraryNames, mediaType);
+        return libraryNames;
     }
 
     @Override
@@ -83,6 +87,7 @@ public class MediaFileLibraryManagerImpl implements MediaFileLibraryManager {
         }
         //Add new root directory.
         mediaFileLibrary.addRootDirectory(path, rootDirectory);
+        LOG.debug("Added root directory [{}] under name [{}] to MediaFileLibrary [{}] for MediaFileType [{}]", path, directoryName, libraryName, mediaType);
     }
 
     @Transactional
@@ -95,6 +100,7 @@ public class MediaFileLibraryManagerImpl implements MediaFileLibraryManager {
         MediaFileLibraryEntity mediaFileLibrary = loadMediaFileLibrary(mediaType, libraryName);
         if (mediaFileLibrary != null) {
             mediaFileLibrary.removeRootDirectory(directoryName);
+            LOG.debug("Removed root directory with name [{}] to MediaFileLibrary [{}] for MediaFileType [{}]", directoryName, libraryName, mediaType);
         }
         return removed;
     }
@@ -111,6 +117,7 @@ public class MediaFileLibraryManagerImpl implements MediaFileLibraryManager {
         MediaFileLibraryEntity mediaFileLibrary = null;
         try {
             mediaFileLibrary = query.getSingleResult();
+            LOG.debug("Loaded MediaFileLibrary [{}] for MediaFileType [{}]", libraryName, mediaType);
         } catch (NoResultException ex) {
             LOG.warn("No MediaFileLibrary for MediaFileType [{}] with name [{}] found.", mediaType, libraryName);
         }

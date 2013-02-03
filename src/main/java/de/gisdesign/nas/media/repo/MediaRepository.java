@@ -42,7 +42,7 @@ public interface MediaRepository<M extends MediaFileData> {
      * Creates a {@link CatalogEntry} representing a media file.
      * @param parent The {@link CatalogEntry} representing the folder containing the media file.
      * @param mediaFileData The {@link MediaFileData}.
-     * @return The created {@link CatalogEntry}.
+     * @return The created {@link CatalogEntry} or <code>null</code> if media file no longer exists.
      */
     public CatalogEntry createMediaFileCatalogEntry(CatalogEntry parent, M mediaFileData);
 
@@ -73,24 +73,19 @@ public interface MediaRepository<M extends MediaFileData> {
     public M createMediaFileData(File mediaFile) throws MediaFileScanException;
 
     /**
-     * Creates the media file meta information for the given media file and stores them
-     * in the backing data base.
-     * @param mediaFile The media file.
-     * @param syncId The synchronization ID to use.
-     * @return The freshly created basic media file information.
-     * @throws MediaFileScanException The extraction of the meta information for the given media file failed.
-     */
-    public M createMediaFileData(File mediaFile, Long syncId) throws MediaFileScanException;
-
-    /**
      * Updates/synchronizes the media file meta information against the underlying file
      * and stores the updated information into the backing database.
      * @param mediaFileData The media file toupdate.
-     * @param syncId The synchronization ID to use.
      * @return The updated basic media file information.
      * @throws MediaFileScanException The extraction of the meta information for the given media file failed.
      */
-    public M updateMediaFileData(M mediaFileData, Long syncId) throws MediaFileScanException;
+    public M updateMediaFileData(M mediaFileData) throws MediaFileScanException;
+
+    /**
+     * Deletes the media file meta information.
+     * @param mediaFileData The media file toupdate.
+     */
+    public void deleteMediaFileData(M mediaFileData);
 
     /**
      * Loads all the basic media file information for a media directory.
@@ -115,12 +110,5 @@ public interface MediaRepository<M extends MediaFileData> {
      * @return The list of available options of the leaf criteria of the meta data criteria tree.
      */
     public List<MetaDataCriteria> loadMetaDataCriteriaOptions(MetaDataCriteria mediaMetaDataCriteria);
-
-    /**
-     * Removes all media files which haven't be synchronized in the synchronization
-     * run identified by the specified synchronization ID.
-     * @param syncId The synchronization ID.
-     */
-    public void deleteOrphanedMediaFiles(Long syncId);
 
 }

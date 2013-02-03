@@ -27,5 +27,6 @@ interface ImageRepositoryDAO {
 
     public ImageFileData saveImage(ImageFileData imageFileData);
 
-    public void deleteOrphanedImages(Long syncId);
+    public void deleteImage(ImageFileData mediaFileData);
+
 }

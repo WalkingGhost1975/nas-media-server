@@ -37,9 +37,6 @@ public class ImageFileData implements MediaFileData, Serializable {
     @Column(name="ID")
     private Long id;
 
-    @Column(name="SYNC_ID")
-    private Long syncId;
-
     @Column(name="LOCATION", length=1024)
     private String absolutePath;
 
@@ -61,15 +58,6 @@ public class ImageFileData implements MediaFileData, Serializable {
 
     public Long getId() {
         return id;
-    }
-
-    public Long getSyncId() {
-        return syncId;
-    }
-
-    @Override
-    public void setSyncId(Long syncId) {
-        this.syncId = syncId;
     }
 
     @Override

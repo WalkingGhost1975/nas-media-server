@@ -56,7 +56,14 @@ public class MetaDataQueryBuilderRegistry {
     public MetaDataQueryBuilder getQueryBuilder(MediaFileType mediaFileType, String name)  {
         Validate.notNull(mediaFileType, "MediaFileType is null.");
         Validate.notNull(name, "Name is null.");
-        return queryBuilderMap.get(buildIdentifier(mediaFileType, name));
+        MetaDataQueryBuilder queryBuilder = queryBuilderMap.get(buildIdentifier(mediaFileType, name));
+        if (queryBuilder != null) {
+            LOG.debug("Retrieved MetaDataQueryBuilder [{}] for MediaFileType [{}]", name, mediaFileType);
+        } else {
+            LOG.error("Retrieved MetaDataQueryBuilder [{}] for MediaFileType [{}] unavailable.", name, mediaFileType);
+            throw new IllegalStateException("MetaDataQueryBuilder with name [" + name + "] for MediaFileType [" + mediaFileType + "] unavailable.");
+        }
+        return queryBuilder;
     }
 
     private String buildIdentifier(MediaFileType mediaFileType, String name)  {

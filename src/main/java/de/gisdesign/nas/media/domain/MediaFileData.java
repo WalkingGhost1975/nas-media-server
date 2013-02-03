@@ -7,12 +7,6 @@ package de.gisdesign.nas.media.domain;
 public interface MediaFileData {
 
     /**
-     * Sets the sync ID. Files with invalid sync ID will be deleted after synchronization run.
-     * @param syncId
-     */
-    public void setSyncId(Long syncId);
-
-    /**
      * Retrurns the absolute path of the media file directory the media file can be found.
      * @return The location of the media file.
      */

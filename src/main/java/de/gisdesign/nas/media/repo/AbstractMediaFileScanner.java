@@ -59,12 +59,9 @@ public abstract class AbstractMediaFileScanner<M extends MediaFileData> implemen
         Validate.notNull(mediaFileLibrary, "MediaFileLibrary is null.");
         List<MediaRootDirectory> rootDirectories = mediaFileLibrary.getRootDirectories();
         //Recursively traverse the root directories and scan for media files.
-        Long syncId = System.currentTimeMillis();
         for (MediaRootDirectory rootDirectory : rootDirectories) {
-            synchronizeDirectory(syncId, rootDirectory.getDirectory());
+            synchronizeDirectory(rootDirectory.getDirectory());
         }
-        //Delete all non-synced files
-        //getMediaRepository().deleteOrphanedMediaFiles(syncId);
     }
 
     /**
@@ -80,13 +77,13 @@ public abstract class AbstractMediaFileScanner<M extends MediaFileData> implemen
      * @param syncId The ID of the synchronization run.
      * @param directory The directory to synchronize.
      */
-    private void synchronizeDirectory(Long syncId, File directory) {
-        LOG.info("Synchronizing media files of type [{}] files in directory [{}]", getMediaFileType(), directory.getAbsolutePath());
-        synchronizeMediaFiles(syncId, directory);
+    private void synchronizeDirectory(File directory) {
+        LOG.debug("Synchronizing media files of type [{}] files in directory [{}]", getMediaFileType(), directory.getAbsolutePath());
+        synchronizeMediaFiles(directory);
         File[] subDirectories = directory.listFiles(directoryFilter);
         for (int i = 0; i < subDirectories.length; i++) {
             File subDirectory = subDirectories[i];
-            synchronizeDirectory(syncId, subDirectory);
+            synchronizeDirectory(subDirectory);
         }
     }
     /**
@@ -95,7 +92,7 @@ public abstract class AbstractMediaFileScanner<M extends MediaFileData> implemen
      * @param syncId The ID of the synchronization run.
      * @param directory The directory to synchronize.
      */
-    private void synchronizeMediaFiles(Long syncId, File directory) {
+    private void synchronizeMediaFiles(File directory) {
         MediaRepository<M> mediaRepository = getMediaRepository();
         Map<String, M> mediaFileDataMap = mediaRepository.loadMediaFilesFromDirectory(directory);
         File[] mediaFiles = directory.listFiles(mediaFileFilter);
@@ -105,17 +102,22 @@ public abstract class AbstractMediaFileScanner<M extends MediaFileData> implemen
             try {
                 if (mediaFileDataMap.containsKey(mediaFile.getName())) {
                     LOG.debug("Updating MediaFileData for media file [{}].", mediaFile.getAbsolutePath());
-                    M mediaFileData = mediaFileDataMap.get(mediaFile.getName());
-                    mediaRepository.updateMediaFileData(mediaFileData, syncId);
+                    M mediaFileData = mediaFileDataMap.remove(mediaFile.getName());
+                    mediaRepository.updateMediaFileData(mediaFileData);
                 } else if (mediaRepository.isSupportedMediaFile(mediaFile)) {
                     LOG.debug("Creating MediaFileData for media file [{}].", mediaFile.getAbsolutePath());
-                    mediaRepository.createMediaFileData(mediaFile, syncId);
+                    mediaRepository.createMediaFileData(mediaFile);
                 } else {
                     LOG.info("Skipping MediaFile [{}] in directory [{}]: Unsupported file type.", mediaFile.getName(), directory.getAbsolutePath());
                 }
             } catch (MediaFileScanException ex)  {
                 LOG.error("Error while scanning MediaFile [" + mediaFile.getName() + "] in directory [" + directory.getAbsolutePath() + "]", ex);
             }
+        }
+        //Delete remaining media data entries.
+        for (M mediaFileData : mediaFileDataMap.values()) {
+            LOG.debug("Deleting MediaFileData for media file [{}] in directory [{}].", mediaFileData.getFilename(), mediaFileData.getAbsolutePath());
+            mediaRepository.deleteMediaFileData(mediaFileData);
         }
     }
 

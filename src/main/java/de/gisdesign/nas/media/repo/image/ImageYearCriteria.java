@@ -53,7 +53,7 @@ class ImageYearCriteria implements MetaDataQueryBuilder {
 
     @Override
     public Expression<?> buildExpression(CriteriaBuilder cb, Root<?> root) {
-        return cb.function("year", Integer.class, root.get("imageMetaData").get("creationDate"));
+        return cb.function("year", Integer.class, root.get("metaData").get("creationDate"));
     }
 
 }

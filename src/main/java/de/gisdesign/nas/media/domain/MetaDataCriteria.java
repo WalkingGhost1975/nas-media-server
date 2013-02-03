@@ -98,4 +98,26 @@ public class MetaDataCriteria {
         clone.childCriteria = (childCriteria != null) ? childCriteria.copy() : null;
         return clone;
     }
+
+    /**
+     * Dumps the hoerachy of the {@link MetaDataCriteria} into a human readble form.
+     * Only used for debugging purposes.
+     * @return The string representation of the {@link MetaDataCriteria} hierachy.
+     */
+    public String dumpHierarchy()  {
+        MetaDataCriteria currentCriteria = this;
+        StringBuilder sb = new StringBuilder();
+        int level = 0;
+        while (currentCriteria != null) {
+            StringBuilder criteria = new StringBuilder();
+            criteria.append(currentCriteria.getName()).append(":").append(currentCriteria.getValue());
+            if (level > 0) {
+                criteria.append("; ");
+            }
+            sb.insert(0, criteria);
+            currentCriteria = currentCriteria.getParent();
+            level++;
+        }
+        return sb.toString();
+    }
 }

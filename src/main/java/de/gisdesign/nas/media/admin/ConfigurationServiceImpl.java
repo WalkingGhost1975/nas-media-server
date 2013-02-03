@@ -28,7 +28,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     public String getConfigurationParameter(MediaFileType mediaFileType, String parameterName) {
         ConfigurationParameter configParameter = loadConfigurationParameter(mediaFileType, parameterName);
-        return (configParameter != null) ? configParameter.getValue() : null;
+        String configValue = (configParameter != null) ? configParameter.getValue() : null;
+        LOG.debug("Loaded configuration parameter [{}:{}] with value [{}].", mediaFileType, parameterName, configValue);
+        return configValue;
     }
 
     @Transactional
@@ -41,6 +43,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             configParameter = new ConfigurationParameter(mediaFileType, parameterName, parameterValue);
             em.persist(configParameter);
         }
+        LOG.debug("Updated configuration parameter [{}:{}] to value [{}].", mediaFileType, parameterName, parameterValue);
     }
 
     /**

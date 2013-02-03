@@ -120,7 +120,9 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
         if (criteria.isLeaf())  {
             for (M mediaFileData : this.mediaFileDataMap.values()) {
                 CatalogEntry catalogEntry = mediaRepository.createMediaFileCatalogEntry(this, mediaFileData);
-                children.add(catalogEntry);
+                if (catalogEntry != null)  {
+                    children.add(catalogEntry);
+                }
             }
         } else {
             for (MetaDataCriteria childCriteria : this.childCriteriaMap.values()) {

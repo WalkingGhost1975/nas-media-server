@@ -69,6 +69,9 @@ public class ImageLibrariesResource {
         ImageLibraryResource imageLibraryResource = null;
         if (imageLibrary != null)  {
             imageLibraryResource = new ImageLibraryResource(imageRepository, imageLibrary, uriInfo);
+            LOG.debug("Created ImageLibraryResource for MediaFileLibrary [{}].", libraryName);
+        } else {
+            LOG.warn("MediaFileLibrary [{}] unknown.", libraryName);
         }
         return imageLibraryResource;
     }

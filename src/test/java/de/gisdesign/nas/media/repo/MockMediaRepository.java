@@ -16,13 +16,7 @@ import java.util.Map;
  */
 public class MockMediaRepository implements MediaRepository<ImageFileData> {
 
-    private boolean deletedOrphans = false;
-
     private Map<String, Map<String,ImageFileData>> imageFileDataMap = new HashMap<String, Map<String,ImageFileData>>();
-
-    public boolean isDeletedOrphans() {
-        return deletedOrphans;
-    }
 
     @Override
     public MediaFileType getSupportedMediaFileType() {
@@ -51,35 +45,40 @@ public class MockMediaRepository implements MediaRepository<ImageFileData> {
 
     @Override
     public ImageFileData createMediaFileData(File mediaFile) throws MediaFileScanException {
-        return createMediaFileData(mediaFile, null);
-    }
-
-    @Override
-    public ImageFileData createMediaFileData(File mediaFile, Long syncId) throws MediaFileScanException {
         ImageFileData imageFileData = new ImageFileData();
         imageFileData.setAbsolutePath(mediaFile.getParentFile().getAbsolutePath());
         imageFileData.setFilename(mediaFile.getName());
-        imageFileData.setSyncId(syncId);
         storeImageFileData(mediaFile, imageFileData);
         return imageFileData;
     }
 
     @Override
-    public ImageFileData updateMediaFileData(ImageFileData mediaFileData, Long syncId) throws MediaFileScanException {
+    public ImageFileData updateMediaFileData(ImageFileData mediaFileData) throws MediaFileScanException {
         File mediaFile = new File(mediaFileData.getAbsolutePath(), mediaFileData.getFilename());
-        mediaFileData.setSyncId(syncId);
         storeImageFileData(mediaFile, mediaFileData);
         return mediaFileData;
     }
 
     @Override
     public Map<String, ImageFileData> loadMediaFilesFromDirectory(File mediaDirectory) {
-        Map<String,ImageFileData> directory = this.imageFileDataMap.get(mediaDirectory.getAbsolutePath());
-        if (directory == null)  {
-            directory = new HashMap<String, ImageFileData>();
-            this.imageFileDataMap.put(mediaDirectory.getAbsolutePath(), directory);
-        }
-        return directory;
+        Map<String, ImageFileData> directory = loadMediaFilesFromDirectoryInternal(mediaDirectory);
+        return new HashMap<String, ImageFileData>(directory);
+    }
+
+    @Override
+    public List<String> getMediaFileLibraryNames() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public MediaFileLibrary getMediaFileLibrary(String libraryName) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void deleteMediaFileData(ImageFileData mediaFileData) {
+        Map<String, ImageFileData> imageFileDataMap = loadMediaFilesFromDirectoryInternal(new File(mediaFileData.getAbsolutePath()));
+        imageFileDataMap.remove(mediaFileData.getFilename());
     }
 
     @Override
@@ -92,28 +91,18 @@ public class MockMediaRepository implements MediaRepository<ImageFileData> {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public void deleteOrphanedMediaFiles(Long syncId) {
-        this.deletedOrphans = true;
-    }
-
     private void storeImageFileData(File mediaFile, ImageFileData imageFileData) {
-        Map<String,ImageFileData> directory = this.imageFileDataMap.get(mediaFile.getParentFile().getAbsolutePath());
-        if (directory == null)  {
-            directory = new HashMap<String, ImageFileData>();
-            this.imageFileDataMap.put(mediaFile.getParentFile().getAbsolutePath(), directory);
-        }
+        Map<String, ImageFileData> directory = loadMediaFilesFromDirectoryInternal(mediaFile.getParentFile());
         directory.put(mediaFile.getName(), imageFileData);
     }
 
-    @Override
-    public List<String> getMediaFileLibraryNames() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public MediaFileLibrary getMediaFileLibrary(String libraryName) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    private Map<String, ImageFileData> loadMediaFilesFromDirectoryInternal(File mediaDirectory) {
+        Map<String,ImageFileData> directory = this.imageFileDataMap.get(mediaDirectory.getAbsolutePath());
+        if (directory == null)  {
+            directory = new HashMap<String, ImageFileData>();
+            this.imageFileDataMap.put(mediaDirectory.getAbsolutePath(), directory);
+        }
+        return directory;
     }
 
 }

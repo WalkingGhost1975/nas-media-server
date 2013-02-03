@@ -1,6 +1,5 @@
 package de.gisdesign.nas.media.rest.image;
 
-import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
 import de.gisdesign.nas.media.domain.catalog.CriteriaFolderCatalogEntry;
@@ -93,6 +92,7 @@ public class ImageRepositoryResource {
      */
     @Path("/byLibrary")
     public ImageLibrariesResource getLibrary() {
+        LOG.debug("Creating ImageLibrariesResource.");
         return new ImageLibrariesResource(imageRepository, uriInfo);
     }
 
@@ -116,6 +116,7 @@ public class ImageRepositoryResource {
     @Path("/scan")
     public void getScanLibrary() {
         //Scan all libraries
+        LOG.info("Image file scan manually triggered on ImageRepositoryResource.");
         this.imageFileScanner.scanMediaFileLibrary();
     }
 }

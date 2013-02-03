@@ -61,7 +61,7 @@ public class ImageResource {
             }
             //Save updated image data.
             try {
-                imageRepository.updateMediaFileData(imageFileData, imageFileData.getSyncId());
+                imageRepository.updateMediaFileData(imageFileData);
             } catch (MediaFileScanException ex)  {
                 LOG.error("Exception while saving tags of image [" + imageFileData.getAbsolutePath() + "/" + imageFileData.getFilename() + "].", ex);
             }

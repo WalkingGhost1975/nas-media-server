@@ -18,14 +18,14 @@ import org.springframework.stereotype.Component;
 public class ImageScanCronTrigger implements Trigger {
 
     @Autowired
-    private ConfigurationService administrationService;
+    private ConfigurationService configurationService;
 
     @Override
     public Date nextExecutionTime(TriggerContext triggerContext) {
-        String imageScanCronExpression = administrationService.getConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_IMAGE_SCAN);
+        String imageScanCronExpression = configurationService.getConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_IMAGE_SCAN);
         if (imageScanCronExpression == null)  {
             imageScanCronExpression = (String) getDefault(CONFIG_PARAM_IMAGE_SCAN);
-            administrationService.setConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_IMAGE_SCAN, imageScanCronExpression);
+            configurationService.setConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_IMAGE_SCAN, imageScanCronExpression);
         }
         CronTrigger cronTrigger = new CronTrigger(imageScanCronExpression);
         return cronTrigger.nextExecutionTime(triggerContext);
