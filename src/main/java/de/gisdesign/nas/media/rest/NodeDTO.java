@@ -13,16 +13,16 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonTypeInfo(use=JsonTypeInfo.Id.NAME)
-public abstract class Node {
+public abstract class NodeDTO {
 
     private String name;
 
     private String uri;
 
-    public Node() {
+    public NodeDTO() {
     }
 
-    public Node(String name, String uri) {
+    public NodeDTO(String name, String uri) {
         Validate.notNull(name, "Name is null.");
         Validate.notNull(uri, "URI is null.");
         this.name = name;

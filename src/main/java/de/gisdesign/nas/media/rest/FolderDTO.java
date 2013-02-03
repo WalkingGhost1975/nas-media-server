@@ -4,16 +4,16 @@ package de.gisdesign.nas.media.rest;
  * {@link Node} implementation representing a folder containg subfolders and media files.
  * @author Denis Pasek
  */
-public class Folder extends Node {
+public class FolderDTO extends NodeDTO {
 
     private String category;
 
     private int count;
 
-    public Folder() {
+    public FolderDTO() {
     }
 
-    public Folder(String category, String name, String uri, int count) {
+    public FolderDTO(String category, String name, String uri, int count) {
         super(name, uri);
         this.category = category;
         this.count = count;

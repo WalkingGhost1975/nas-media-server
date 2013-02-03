@@ -84,7 +84,12 @@ public class MediaFileLibraryEntity implements MediaFileLibrary, Serializable {
         Validate.notNull(name, "Name of root directory is null.");
         Validate.notNull(directory, "Root directory is null.");
         Validate.isTrue(directory.isDirectory(), "Root directory [" + directory.getAbsolutePath() + "] is not a directory.");
-        MediaRootDirectoryEntity rootDirectory = new MediaRootDirectoryEntity(name, this.mediaFileType, directory.getAbsolutePath());
+        MediaRootDirectoryEntity rootDirectory = (MediaRootDirectoryEntity) getRootDirectory(name);
+        if (rootDirectory != null)  {
+            rootDirectory.updateDirectory(directory.getAbsolutePath());
+        } else {
+            rootDirectory = new MediaRootDirectoryEntity(name, this.mediaFileType, directory.getAbsolutePath());
+        }
         this.mediaFileRootDirectories.add(rootDirectory);
     }
 
@@ -99,6 +104,19 @@ public class MediaFileLibraryEntity implements MediaFileLibrary, Serializable {
             }
         }
         return removed;
+    }
+
+    @Override
+    public MediaRootDirectory getRootDirectory(String directoryName) {
+        MediaRootDirectory mediaRootDirectory = null;
+        List<MediaRootDirectory> rootDirectories = getRootDirectories();
+        for (MediaRootDirectory rootDirectory : rootDirectories) {
+            if (directoryName.equals(rootDirectory.getName()))  {
+                mediaRootDirectory = rootDirectory;
+                break;
+            }
+        }
+        return mediaRootDirectory;
     }
 
     @Override

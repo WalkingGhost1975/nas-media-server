@@ -1,13 +1,13 @@
 package de.gisdesign.nas.media.rest.image;
 
-import de.gisdesign.nas.media.rest.MediaFile;
+import de.gisdesign.nas.media.rest.MediaFileDTO;
 import java.util.List;
 
 /**
  * REST service DTO for Image resources.
  * @author Denis PasekS
  */
-public class Image extends MediaFile {
+public class ImageDTO extends MediaFileDTO {
 
     private String thumbSmallUri;
 
@@ -17,14 +17,14 @@ public class Image extends MediaFile {
 
     private List<String> tags;
 
-    public Image() {
+    public ImageDTO() {
     }
 
-    public Image(String name, String uri) {
+    public ImageDTO(String name, String uri) {
         super(name, uri);
     }
 
-    public Image(String name, String uri, long lastModified, long size) {
+    public ImageDTO(String name, String uri, long lastModified, long size) {
         super(name, uri, lastModified, size);
     }
 

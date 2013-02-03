@@ -86,7 +86,7 @@ public class MediaFileLibraryManagerImpl implements MediaFileLibraryManager {
             em.persist(mediaFileLibrary);
         }
         //Add new root directory.
-        mediaFileLibrary.addRootDirectory(path, rootDirectory);
+        mediaFileLibrary.addRootDirectory(directoryName, rootDirectory);
         LOG.debug("Added root directory [{}] under name [{}] to MediaFileLibrary [{}] for MediaFileType [{}]", path, directoryName, libraryName, mediaType);
     }
 

@@ -19,7 +19,7 @@ public interface CatalogEntryResourceBuilder<M extends MediaFileData> {
      * @param uriInfo The REST {@link UriInfo} of this resource being the parent of the sub resource to be created.
      * @return The {@link MediaFile} for this media file.
      */
-    public MediaFile buildMediaFile(CatalogEntry catalogEntry, UriInfo uriInfo);
+    public MediaFileDTO buildMediaFile(CatalogEntry catalogEntry, UriInfo uriInfo);
 
     /**
      * Must create a REST sub resource representing

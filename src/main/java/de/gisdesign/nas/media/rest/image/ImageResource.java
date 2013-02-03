@@ -7,7 +7,7 @@ import de.gisdesign.nas.media.domain.image.ImageMetaData;
 import de.gisdesign.nas.media.repo.MediaFileScanException;
 import de.gisdesign.nas.media.repo.image.ImageMediaRepository;
 import de.gisdesign.nas.media.repo.image.ScaledImageResources;
-import de.gisdesign.nas.media.rest.MediaFile;
+import de.gisdesign.nas.media.rest.MediaFileDTO;
 import java.io.File;
 import java.util.List;
 import javax.activation.MimetypesFileTypeMap;
@@ -70,7 +70,7 @@ public class ImageResource {
 
     @GET
     @Produces("application/json; charset=UTF-8")
-    public MediaFile getImageNode() {
+    public MediaFileDTO getImageNode() {
         String uri = uriInfo.getAbsolutePathBuilder().build().toString();
         return resourceBuilder.buildMediaFile(imageEntry, uriInfo, uri);
     }

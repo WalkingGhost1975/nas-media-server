@@ -24,6 +24,13 @@ public interface MediaFileLibrary {
     public String getName();
 
     /**
+     * Returns the {@link MediaRootDirectory} with the specified unique directory name.
+     * @param directoryName The configured unique name of the directory in this library.
+     * @return The {@link MediaRootDirectory} or <code>null</code> if not present..
+     */
+    public MediaRootDirectory getRootDirectory(String directoryName);
+
+    /**
      * Returns the {@link Set} of {@link MediaRootDirectory}s.
      * @return The root directories.
      */

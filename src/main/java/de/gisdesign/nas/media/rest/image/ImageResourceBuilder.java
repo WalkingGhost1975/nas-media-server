@@ -7,7 +7,7 @@ import de.gisdesign.nas.media.domain.image.ImageTag;
 import de.gisdesign.nas.media.repo.image.ImageMediaRepository;
 import de.gisdesign.nas.media.repo.image.ScaledImageResources;
 import de.gisdesign.nas.media.rest.CatalogEntryResourceBuilder;
-import de.gisdesign.nas.media.rest.MediaFile;
+import de.gisdesign.nas.media.rest.MediaFileDTO;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.UriInfo;
@@ -38,14 +38,14 @@ public class ImageResourceBuilder implements CatalogEntryResourceBuilder<ImageFi
     }
 
     @Override
-    public MediaFile buildMediaFile(CatalogEntry catalogEntry, UriInfo uriInfo) {
+    public MediaFileDTO buildMediaFile(CatalogEntry catalogEntry, UriInfo uriInfo) {
         Validate.notNull(catalogEntry, "CatalogEntry is null.");
         Validate.notNull(uriInfo, "UriInfo is null.");
         String uri = uriInfo.getAbsolutePathBuilder().path(catalogEntry.getName()).build().toString();
         return buildMediaFile(catalogEntry, uriInfo, uri);
     }
 
-    public MediaFile buildMediaFile(CatalogEntry catalogEntry, UriInfo uriInfo, String uri) {
+    public MediaFileDTO buildMediaFile(CatalogEntry catalogEntry, UriInfo uriInfo, String uri) {
         Validate.notNull(catalogEntry, "CatalogEntry is null.");
         Validate.notNull(uri, "Uri is null.");
         ImageCatalogEntry imageEntry = (ImageCatalogEntry) catalogEntry;
@@ -53,7 +53,7 @@ public class ImageResourceBuilder implements CatalogEntryResourceBuilder<ImageFi
         ImageFileData imageFileData = imageEntry.getImageData();
         ScaledImageResources imageResources = imageRepository.getScaledImageResources(imageFileData);
 
-        Image image = new Image(catalogEntry.getName(), uri, imageEntry.getLastModified(), imageEntry.getSize());
+        ImageDTO image = new ImageDTO(catalogEntry.getName(), uri, imageEntry.getLastModified(), imageEntry.getSize());
         //Set download link
         image.setDownloadUri(uriInfo.getAbsolutePathBuilder().path("/download").build().toString());
         //Set metadata link

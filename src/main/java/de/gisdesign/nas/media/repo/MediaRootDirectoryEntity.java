@@ -61,6 +61,10 @@ public class MediaRootDirectoryEntity implements MediaRootDirectory, Serializabl
         return new File(directory);
     }
 
+    public void updateDirectory(String path) {
+        this.directory = path;
+    }
+
     public MediaFileType getMediaFileType() {
         return mediaFileType;
     }

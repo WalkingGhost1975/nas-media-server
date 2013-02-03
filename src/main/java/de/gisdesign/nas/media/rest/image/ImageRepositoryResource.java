@@ -6,7 +6,7 @@ import de.gisdesign.nas.media.domain.catalog.CriteriaFolderCatalogEntry;
 import de.gisdesign.nas.media.domain.image.ImageFileData;
 import de.gisdesign.nas.media.repo.image.ImageFileScanner;
 import de.gisdesign.nas.media.repo.image.ImageMediaRepository;
-import de.gisdesign.nas.media.rest.Catalog;
+import de.gisdesign.nas.media.rest.CatalogDTO;
 import de.gisdesign.nas.media.rest.CatalogEntryFolderResource;
 import de.gisdesign.nas.media.rest.CatalogEntryResourceBuilder;
 import java.util.ArrayList;
@@ -71,14 +71,14 @@ public class ImageRepositoryResource {
 
     @GET
     @Produces("application/json; charset=UTF-8")
-    public List<Catalog> getCatalogs() {
-        List<Catalog> catalogs = new ArrayList<Catalog>(2);
+    public List<CatalogDTO> getCatalogs() {
+        List<CatalogDTO> catalogs = new ArrayList<CatalogDTO>(2);
         String byFoldersUri = uriInfo.getAbsolutePathBuilder().path("byLibrary").build().toString();
-        catalogs.add(new Catalog("byLibrary", byFoldersUri));
+        catalogs.add(new CatalogDTO("byLibrary", byFoldersUri));
         String byYearsAndMonthUri = uriInfo.getAbsolutePathBuilder().path("byYearAndMonth").build().toString();
-        catalogs.add(new Catalog("byYearAndMonth", byYearsAndMonthUri));
+        catalogs.add(new CatalogDTO("byYearAndMonth", byYearsAndMonthUri));
         String byTagUri = uriInfo.getAbsolutePathBuilder().path("byTag").build().toString();
-        catalogs.add(new Catalog("byTag", byTagUri));
+        catalogs.add(new CatalogDTO("byTag", byTagUri));
         return catalogs;
     }
 

@@ -110,8 +110,8 @@ public class CatalogEntryFolderResource {
      */
     @GET
     @Produces("application/json; charset=UTF-8")
-    public List<Node> getCatalogEntries() {
-        List<Node> nodes = new LinkedList<Node>();
+    public List<NodeDTO> getCatalogEntries() {
+        List<NodeDTO> nodes = new LinkedList<NodeDTO>();
         if (catalogEntry.isFolder())  {
             LOG.debug("Creating Nodes of Folder [{}].", catalogEntry.getPath());
             List<CatalogEntry> subEntries = catalogEntry.getChildren();
@@ -119,7 +119,7 @@ public class CatalogEntryFolderResource {
                 long start = System.currentTimeMillis();
                 String uri = uriInfo.getAbsolutePathBuilder().path(subEntry.getName()).build().toString();
                 if (subEntry.isFolder())  {
-                    nodes.add(new Folder(subEntry.getCategory(), subEntry.getName(), uri, subEntry.size()));
+                    nodes.add(new FolderDTO(subEntry.getCategory(), subEntry.getName(), uri, subEntry.size()));
                     LOG.debug("Created SubFolder [{}] in Folder [{}] in [{}ms].", subEntry.getName(), catalogEntry.getPath(), (System.currentTimeMillis() - start));
                 } else {
                     nodes.add(resourceBuilder.buildMediaFile(subEntry, uriInfo));
@@ -137,16 +137,16 @@ public class CatalogEntryFolderResource {
      * are always sorted on to the beginning in alphabetical orders followed by the
      * media entries in alphabetical order.
      */
-    private static final class NodeComparator implements Comparator<Node> {
+    private static final class NodeComparator implements Comparator<NodeDTO> {
         @Override
-        public int compare(Node o1, Node o2) {
+        public int compare(NodeDTO o1, NodeDTO o2) {
             int result;
-            if (o1 instanceof Folder)  {
+            if (o1 instanceof FolderDTO)  {
                 result = -1;
-                if (o2 instanceof Folder)  {
+                if (o2 instanceof FolderDTO)  {
                     result = o1.getName().compareTo(o2.getName());
                 }
-            } else if (o2 instanceof Folder) {
+            } else if (o2 instanceof FolderDTO) {
                 result = 1;
             } else {
                 result = o1.getName().compareTo(o2.getName());

@@ -6,7 +6,7 @@ import java.util.List;
  *
  * @author Denis Pasek
  */
-public class MediaFile extends Node {
+public class MediaFileDTO extends NodeDTO {
 
     private long lastModified;
 
@@ -16,14 +16,14 @@ public class MediaFile extends Node {
 
     private String downloadUri;
 
-    public MediaFile() {
+    public MediaFileDTO() {
     }
 
-    public MediaFile(String name, String uri) {
+    public MediaFileDTO(String name, String uri) {
         super(name, uri);
     }
 
-    public MediaFile(String name, String uri, long lastModified, long size) {
+    public MediaFileDTO(String name, String uri, long lastModified, long size) {
         super(name, uri);
         this.lastModified = lastModified;
         this.size = size;

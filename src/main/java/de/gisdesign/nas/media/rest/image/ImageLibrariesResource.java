@@ -2,7 +2,7 @@ package de.gisdesign.nas.media.rest.image;
 
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.repo.image.ImageMediaRepository;
-import de.gisdesign.nas.media.rest.Folder;
+import de.gisdesign.nas.media.rest.FolderDTO;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.GET;
@@ -49,14 +49,14 @@ public class ImageLibrariesResource {
 
     @GET
     @Produces("application/json; charset=UTF-8")
-    public List<Folder> getLibraries()  {
+    public List<FolderDTO> getLibraries()  {
         LOG.debug("Creating Folders for MediaFileLibraries.");
         List<String> imageLibraryNames = imageRepository.getMediaFileLibraryNames();
-        List<Folder> folders = new ArrayList<Folder>(imageLibraryNames.size());
+        List<FolderDTO> folders = new ArrayList<FolderDTO>(imageLibraryNames.size());
         for (String libraryName : imageLibraryNames) {
             String uri = uriInfo.getAbsolutePathBuilder().path(libraryName).build().toString();
             MediaFileLibrary imageLibrary = imageRepository.getMediaFileLibrary(libraryName);
-            folders.add(new Folder("directory", libraryName, uri, imageLibrary.getRootDirectories().size()));
+            folders.add(new FolderDTO("directory", libraryName, uri, imageLibrary.getRootDirectories().size()));
             LOG.debug("Created Folder for MediaFileLibrary [{}].", imageLibrary.getName());
         }
         LOG.debug("Created [{}] Folders for MediaFileLibraries successfully.", folders.size());

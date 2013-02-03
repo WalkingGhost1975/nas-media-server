@@ -4,12 +4,12 @@ package de.gisdesign.nas.media.rest;
  *
  * @author Denis Pasek
  */
-public class Catalog extends Node {
+public class CatalogDTO extends NodeDTO {
 
-    public Catalog() {
+    public CatalogDTO() {
     }
 
-    public Catalog(String name, String uri) {
+    public CatalogDTO(String name, String uri) {
         super(name, uri);
     }
 
