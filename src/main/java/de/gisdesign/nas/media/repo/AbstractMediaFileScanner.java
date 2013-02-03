@@ -1,9 +1,9 @@
 package de.gisdesign.nas.media.repo;
 
-import de.gisdesign.nas.media.admin.AdministrationService;
 import de.gisdesign.nas.media.domain.MediaFileData;
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
+import de.gisdesign.nas.media.domain.MediaRootDirectory;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.List;
@@ -37,7 +37,7 @@ public abstract class AbstractMediaFileScanner<M extends MediaFileData> implemen
     private final FileFilter directoryFilter = new DirectoryFilter();
 
     @Autowired
-    private AdministrationService administrationService;
+    private MediaFileLibraryManager mediaFileLibraryManager;
 
     @Override
     public MediaFileType getMediaFileType() {
@@ -45,21 +45,26 @@ public abstract class AbstractMediaFileScanner<M extends MediaFileData> implemen
     }
 
     public void scanMediaFileLibrary()  {
-        MediaFileLibrary mediaFileLibrary = administrationService.getMediaFileLibrary(getMediaFileType());
-        scanMediaFileLibrary(mediaFileLibrary);
+        List<String> libraryNames = mediaFileLibraryManager.getMediaFileLibraryNames(getMediaFileType());
+        LOG.info("Scanning [{}] MediaFileLibraries of type [{}].", libraryNames.size(), getMediaFileType());
+        for (String libraryName : libraryNames) {
+            MediaFileLibrary mediaFileLibrary = mediaFileLibraryManager.getMediaFileLibrary(getMediaFileType(), libraryName);
+            LOG.info("Scanning [{}] root directories of MediaFileLibrary [{}] of type [{}]", mediaFileLibrary.getRootDirectories().size(), mediaFileLibrary.getName(), getMediaFileType());
+            scanMediaFileLibrary(mediaFileLibrary);
+        }
     }
 
     @Override
     public void scanMediaFileLibrary(MediaFileLibrary mediaFileLibrary) {
         Validate.notNull(mediaFileLibrary, "MediaFileLibrary is null.");
-        List<File> rootDirectories = mediaFileLibrary.getRootDirectories();
+        List<MediaRootDirectory> rootDirectories = mediaFileLibrary.getRootDirectories();
         //Recursively traverse the root directories and scan for media files.
         Long syncId = System.currentTimeMillis();
-        for (File rootDirectory : rootDirectories) {
-            synchronizeDirectory(syncId, rootDirectory);
+        for (MediaRootDirectory rootDirectory : rootDirectories) {
+            synchronizeDirectory(syncId, rootDirectory.getDirectory());
         }
         //Delete all non-synced files
-        getMediaRepository().deleteOrphanedMediaFiles(syncId);
+        //getMediaRepository().deleteOrphanedMediaFiles(syncId);
     }
 
     /**

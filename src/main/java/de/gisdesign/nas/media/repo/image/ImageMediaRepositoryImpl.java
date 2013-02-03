@@ -5,7 +5,7 @@ import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
-import de.gisdesign.nas.media.admin.AdministrationService;
+import de.gisdesign.nas.media.admin.ConfigurationService;
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
@@ -19,6 +19,7 @@ import de.gisdesign.nas.media.domain.image.ImageFileData;
 import de.gisdesign.nas.media.domain.image.ImageMetaData;
 import de.gisdesign.nas.media.domain.image.ImageSourceData;
 import de.gisdesign.nas.media.domain.image.WhiteBalanceMode;
+import de.gisdesign.nas.media.repo.MediaFileLibraryManager;
 import de.gisdesign.nas.media.repo.MediaFileScanException;
 import static de.gisdesign.nas.media.repo.image.Configuration.*;
 import java.io.File;
@@ -47,7 +48,10 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
     private static final Logger LOG = LoggerFactory.getLogger(ImageMediaRepositoryImpl.class);
 
     @Autowired
-    private AdministrationService administrationService;
+    private ConfigurationService administrationService;
+
+    @Autowired
+    private MediaFileLibraryManager mediaFileLibraryManager;
 
     @Autowired
     private ImageRepositoryDAO mediaRepositoryDAO;
@@ -56,8 +60,13 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
     private ThumbGenerator thumbGenerator;
 
     @Override
-    public MediaFileLibrary getMediaFileLibrary() {
-        return this.administrationService.getMediaFileLibrary(MediaFileType.IMAGE);
+    public List<String> getMediaFileLibraryNames() {
+        return this.mediaFileLibraryManager.getMediaFileLibraryNames(MediaFileType.IMAGE);
+    }
+
+    @Override
+    public MediaFileLibrary getMediaFileLibrary(String libraryName) {
+        return this.mediaFileLibraryManager.getMediaFileLibrary(MediaFileType.IMAGE, libraryName);
     }
 
     @Override

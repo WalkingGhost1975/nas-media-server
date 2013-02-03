@@ -107,7 +107,12 @@ public class MockMediaRepository implements MediaRepository<ImageFileData> {
     }
 
     @Override
-    public MediaFileLibrary getMediaFileLibrary() {
+    public List<String> getMediaFileLibraryNames() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public MediaFileLibrary getMediaFileLibrary(String libraryName) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

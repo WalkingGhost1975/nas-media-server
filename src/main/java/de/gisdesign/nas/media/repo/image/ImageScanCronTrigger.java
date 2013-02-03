@@ -1,6 +1,6 @@
 package de.gisdesign.nas.media.repo.image;
 
-import de.gisdesign.nas.media.admin.AdministrationService;
+import de.gisdesign.nas.media.admin.ConfigurationService;
 import de.gisdesign.nas.media.domain.MediaFileType;
 import static de.gisdesign.nas.media.repo.image.Configuration.*;
 import java.util.Date;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class ImageScanCronTrigger implements Trigger {
 
     @Autowired
-    private AdministrationService administrationService;
+    private ConfigurationService administrationService;
 
     @Override
     public Date nextExecutionTime(TriggerContext triggerContext) {

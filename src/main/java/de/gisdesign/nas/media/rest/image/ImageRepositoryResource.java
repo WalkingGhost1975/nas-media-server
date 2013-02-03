@@ -1,6 +1,5 @@
 package de.gisdesign.nas.media.rest.image;
 
-import de.gisdesign.nas.media.admin.AdministrationService;
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
@@ -26,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Root REST resource for managing image media. Supports a standard image
+ * Root REST resource for managing image files. Supports a standard image
  * catalog model based on the file system structure and configurable catalogs
  * which use image meta data managed in a image meta data repository, e.g. a
  * database.
@@ -42,18 +41,16 @@ public class ImageRepositoryResource {
      */
     private static final Logger LOG = LoggerFactory.getLogger(ImageRepositoryResource.class);
     /**
-     * The {@link MediaRepositoryService}.
+     * The {@link ImageMediaRepository}.
      */
     @Autowired
-    private ImageMediaRepository mediaRepository;
+    private ImageMediaRepository imageRepository;
     /**
      * The {@link ImageFileScanner}.
      */
     @Autowired
     private ImageFileScanner imageFileScanner;
 
-    @Autowired
-    private AdministrationService adminService;
     /**
      * The {@link CatalogEntryResourceBuilder}.
      */
@@ -70,15 +67,15 @@ public class ImageRepositoryResource {
     @PostConstruct
     public void init() {
         LOG.info("Initialized ImageRepository REST service!");
-        resourceBuilder = new ImageResourceBuilder(mediaRepository);
+        resourceBuilder = new ImageResourceBuilder(imageRepository);
     }
 
     @GET
     @Produces("application/json; charset=UTF-8")
     public List<Catalog> getCatalogs() {
         List<Catalog> catalogs = new ArrayList<Catalog>(2);
-        String byFoldersUri = uriInfo.getAbsolutePathBuilder().path("byFolder").build().toString();
-        catalogs.add(new Catalog("byFolder", byFoldersUri));
+        String byFoldersUri = uriInfo.getAbsolutePathBuilder().path("byLibrary").build().toString();
+        catalogs.add(new Catalog("byLibrary", byFoldersUri));
         String byYearsAndMonthUri = uriInfo.getAbsolutePathBuilder().path("byYearAndMonth").build().toString();
         catalogs.add(new Catalog("byYearAndMonth", byYearsAndMonthUri));
         String byTagUri = uriInfo.getAbsolutePathBuilder().path("byTag").build().toString();
@@ -94,11 +91,9 @@ public class ImageRepositoryResource {
      * @return The REST resource representing the image library organized by
      * filesystem directories.
      */
-    @Path("/byFolder")
-    public ImageLibraryResource getLibrary() {
-        MediaFileLibrary imageFileLibrary = adminService.getMediaFileLibrary(MediaFileType.IMAGE);
-        LOG.debug("Returning ImageLibraryResource for root folders {}", imageFileLibrary.getRootDirectories());
-        return new ImageLibraryResource(mediaRepository, imageFileLibrary.getRootDirectories(), uriInfo);
+    @Path("/byLibrary")
+    public ImageLibrariesResource getLibrary() {
+        return new ImageLibrariesResource(imageRepository, uriInfo);
     }
 
     @Path("/byYearAndMonth")
@@ -106,21 +101,21 @@ public class ImageRepositoryResource {
         MetaDataCriteria yearCriteria = new MetaDataCriteria(MediaFileType.IMAGE, "creationDateYear");
         MetaDataCriteria monthCriteria = new MetaDataCriteria(MediaFileType.IMAGE, "creationDateMonth");
         yearCriteria.setChildCriteria(monthCriteria);
-        CriteriaFolderCatalogEntry<ImageFileData> catalogEntry = new CriteriaFolderCatalogEntry<ImageFileData>(mediaRepository, null, yearCriteria);
+        CriteriaFolderCatalogEntry<ImageFileData> catalogEntry = new CriteriaFolderCatalogEntry<ImageFileData>(imageRepository, null, yearCriteria);
         return new CatalogEntryFolderResource(resourceBuilder, catalogEntry, uriInfo);
     }
 
     @Path("/byTag")
     public CatalogEntryFolderResource getByTag() {
         MetaDataCriteria tagLevel1Criteria = new MetaDataCriteria(MediaFileType.IMAGE, "tags");
-        CriteriaFolderCatalogEntry<ImageFileData> catalogEntry = new CriteriaFolderCatalogEntry<ImageFileData>(mediaRepository, null, tagLevel1Criteria);
+        CriteriaFolderCatalogEntry<ImageFileData> catalogEntry = new CriteriaFolderCatalogEntry<ImageFileData>(imageRepository, null, tagLevel1Criteria);
         return new CatalogEntryFolderResource(resourceBuilder, catalogEntry, uriInfo);
     }
 
     @POST
     @Path("/scan")
     public void getScanLibrary() {
-        MediaFileLibrary imageFileLibrary = adminService.getMediaFileLibrary(MediaFileType.IMAGE);
-        this.imageFileScanner.scanMediaFileLibrary(imageFileLibrary);
+        //Scan all libraries
+        this.imageFileScanner.scanMediaFileLibrary();
     }
 }

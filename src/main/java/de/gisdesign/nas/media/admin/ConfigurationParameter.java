@@ -9,14 +9,19 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import org.apache.commons.lang.Validate;
 
 /**
- *
+ * Entity use for storing configuration parameters for the media repositories
+ * in the data base
  * @author Denis Pasek
  */
 @Entity
-@Table(name="CONFIG_PARAMS")
-public class MediaRepositoryConfigurationParameter implements Serializable {
+@Table(name="CONFIGURATION", uniqueConstraints={
+    @UniqueConstraint(columnNames={"MEDIA_TYPE", "PARAM_NAME"})
+})
+public class ConfigurationParameter implements Serializable {
     /**
      * Serialization ID.
      */
@@ -37,32 +42,29 @@ public class MediaRepositoryConfigurationParameter implements Serializable {
     @Column(name="PARAM_VALUE")
     private String value;
 
-    public Long getId() {
-        return id;
+    public ConfigurationParameter() {
+    }
+
+    public ConfigurationParameter(MediaFileType mediaFileType, String name, String value) {
+        this.mediaFileType = mediaFileType;
+        this.name = name;
+        this.value = value;
     }
 
     public MediaFileType getMediaFileType() {
         return mediaFileType;
     }
 
-    public void setMediaFileType(MediaFileType mediaFileType) {
-        this.mediaFileType = mediaFileType;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void updateValue(String value)  {
+        Validate.notNull(value, "New value of configuration parameter is null.");
         this.value = value;
     }
-
 }

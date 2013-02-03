@@ -1,5 +1,7 @@
 package de.gisdesign.nas.media.rest.image;
 
+import de.gisdesign.nas.media.domain.MediaFileLibrary;
+import de.gisdesign.nas.media.domain.MediaRootDirectory;
 import de.gisdesign.nas.media.domain.catalog.MediaDirectoryCatalogEntry;
 import de.gisdesign.nas.media.domain.image.ImageFileData;
 import de.gisdesign.nas.media.repo.image.ImageMediaRepository;
@@ -16,7 +18,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.UriInfo;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,11 @@ public class ImageLibraryResource {
     private ImageMediaRepository imageRepository;
 
     /**
+     * The {@link MediaFileLibrary} represent by the resource instance.
+     */
+    private MediaFileLibrary imageLibrary;
+
+    /**
      * The {@link CatalogEntryResourceBuilder}.
      */
     private CatalogEntryResourceBuilder<ImageFileData> resourceBuilder;
@@ -57,23 +63,25 @@ public class ImageLibraryResource {
     /**
      * Constructor.
      * @param imageRepository The {@link ImageMediaRepository}.
-     * @param rootFolders The list of root directory.
+     * @param imageLibrary The {@link MediaFileLibrary}.
      * @param uriInfo The {@link UriInfo} of this resource.
      */
-    public ImageLibraryResource(ImageMediaRepository imageRepository, List<File> rootFolders, UriInfo uriInfo) {
-        Validate.notNull(rootFolders, "Root folders for ImageLibraryResource are null.");
+    public ImageLibraryResource(ImageMediaRepository imageRepository, MediaFileLibrary imageLibrary, UriInfo uriInfo) {
+        Validate.notNull(imageLibrary, "MediaFileLibrary for ImageLibraryResource is null.");
         Validate.notNull(imageRepository, "ImageMediaRepository is null.");
-        LOG.debug("Assembling CatalogEntries for root folders {}.", rootFolders);
+        LOG.debug("Assembling CatalogEntries of MediaFileLibrary [{}] for root directories {}.", imageLibrary.getName(), imageLibrary.getRootDirectories());
+        this.imageLibrary = imageLibrary;
         this.imageRepository = imageRepository;
         this.resourceBuilder = new ImageResourceBuilder(imageRepository);
         this.uriInfo = uriInfo;
-        for (File folder : rootFolders) {
-            if (folder.exists() && folder.isDirectory())  {
-                LOG.debug("Creating ImageDirectoryCatalogEntry for root folder [{}].", folder.getAbsoluteFile());
-                imageFolders.put(generateImageFolderId(folder), new MediaDirectoryCatalogEntry<ImageFileData>(this.imageRepository, null, folder));
-                LOG.debug("Created ImageDirectoryCatalogEntry for root folder [{}] successfully.", folder.getAbsoluteFile());
+        for (MediaRootDirectory imageRootDirectory : imageLibrary.getRootDirectories()) {
+            File rootDirectory = imageRootDirectory.getDirectory();
+            if (rootDirectory.exists() && rootDirectory.isDirectory())  {
+                LOG.debug("Creating ImageDirectoryCatalogEntry for root directory [{}] of MediaFileLibrary [{}].", rootDirectory.getAbsoluteFile(), imageLibrary.getName());
+                imageFolders.put(imageRootDirectory.getName(), new MediaDirectoryCatalogEntry<ImageFileData>(this.imageRepository, null, rootDirectory));
+                LOG.debug("Created ImageDirectoryCatalogEntry for root directory [{}] of MediaFileLibrary [{}] successfully.", rootDirectory.getAbsoluteFile(), imageLibrary.getName());
             } else {
-                LOG.error("Skipping invalid root folder [{}] for image library.", folder.getAbsolutePath());
+                LOG.error("Skipping invalid root directory [{}] of MediaFileLibrary [{}].", rootDirectory.getAbsolutePath(), imageLibrary.getName());
             }
         }
     }
@@ -81,15 +89,15 @@ public class ImageLibraryResource {
     @GET
     @Produces("application/json; charset=UTF-8")
     public List<Folder> getFolders()  {
-        LOG.debug("Creating Folder DTOs for ImageLibrary.");
+        LOG.debug("Creating Folders for MediaFileLibrary [{}].", this.imageLibrary.getName());
         List<Folder> folders = new ArrayList<Folder>(imageFolders.size());
         for (Map.Entry<String,MediaDirectoryCatalogEntry<ImageFileData>> folderEntry : imageFolders.entrySet()) {
             String uri = uriInfo.getAbsolutePathBuilder().path(folderEntry.getKey()).build().toString();
             MediaDirectoryCatalogEntry<ImageFileData> folder = folderEntry.getValue();
             folders.add(new Folder(folder.getCategory(), folder.getName(), uri, folder.size()));
-            LOG.debug("Created Folder DTO for root folder [{}].", folder.getName());
+            LOG.debug("Created Folder for root folder [{}].", folder.getName());
         }
-        LOG.debug("Created [{}] Folder DTOs for ImageLibrary successfully.", folders.size());
+        LOG.debug("Created [{}] Folders for MediaFileLibrary [{}] successfully.", folders.size(), this.imageLibrary.getName());
         return folders;
     }
 
@@ -104,14 +112,5 @@ public class ImageLibraryResource {
             LOG.warn("No root folder with ID [{}] found.", id);
         }
         return folderResource;
-    }
-
-    /**
-     * Generates a unique reproducible folder ID.
-     * @param folder The folder to genrate the ID.
-     * @return The folder ID.
-     */
-    private String generateImageFolderId(File folder)  {
-        return DigestUtils.md5Hex(folder.getAbsolutePath());
     }
 }

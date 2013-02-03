@@ -19,11 +19,18 @@ import java.util.Map;
 public interface MediaRepository<M extends MediaFileData> {
 
     /**
+     * Retrieves the names of all available {@link MediaFileLibrary}s.
+     * @return The name of the {@link MediaFileLibrary}s.
+     */
+    public List<String> getMediaFileLibraryNames();
+
+    /**
      * Retrieves the configured {@link MediaFileLibrary}. {@link MediaFileLibrary}s are used to aggregate multiple directories
      * into a library.
+     * @param libraryName The name of the {@link MediaFileLibrary}.
      * @return The {@link MediaFileLibrary}
      */
-    public MediaFileLibrary getMediaFileLibrary();
+    public MediaFileLibrary getMediaFileLibrary(String libraryName);
 
     /**
      * Returns the supported {@link MediaFileType} of this {@link MediaRepository}.

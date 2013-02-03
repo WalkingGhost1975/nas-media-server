@@ -5,8 +5,9 @@
     <non-jta-data-source>mediadb</non-jta-data-source>
     <class>de.gisdesign.nas.media.domain.image.ImageFileData</class>
     <class>de.gisdesign.nas.media.domain.image.ImageTag</class>
-    <class>de.gisdesign.nas.media.admin.MediaFileRootDirectory</class>
-    <class>de.gisdesign.nas.media.admin.MediaRepositoryConfigurationParameter</class>
+    <class>de.gisdesign.nas.media.admin.ConfigurationParameter</class>
+    <class>de.gisdesign.nas.media.repo.MediaFileLibraryEntity</class>
+    <class>de.gisdesign.nas.media.repo.MediaRootDirectoryEntity</class>
     <validation-mode>NONE</validation-mode>
     <properties>
       <property name="hibernate.hbm2ddl.auto" value="update"/>

@@ -1,6 +1,8 @@
-package de.gisdesign.nas.media.admin;
+package de.gisdesign.nas.media.repo;
 
 import de.gisdesign.nas.media.domain.MediaFileType;
+import de.gisdesign.nas.media.domain.MediaRootDirectory;
+import java.io.File;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,14 +11,17 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
- *
+ * Entity for storing a root directory of a {@link MediaFileLibraryEntity}.
  * @author Denis Pasek
  */
 @Entity
-@Table(name="MEDIA_ROOT_FOLDER")
-public class MediaFileRootDirectory implements Serializable {
+@Table(name="MEDIA_DIRECTORY", uniqueConstraints={
+    @UniqueConstraint(columnNames={"FILE_TYPE","NAME"})
+})
+public class MediaRootDirectoryEntity implements MediaRootDirectory, Serializable {
     /**
      * Serialization ID.
      */
@@ -31,40 +36,39 @@ public class MediaFileRootDirectory implements Serializable {
     @Column(name="FILE_TYPE", length=16)
     private MediaFileType mediaFileType;
 
+    @Column(name="NAME", length=16)
+    private String name;
+
     @Column(name="DIRECTORY", length=1024)
     private String directory;
 
-    public MediaFileRootDirectory() {
+    public MediaRootDirectoryEntity() {
     }
 
-    public MediaFileRootDirectory(MediaFileType mediaFileType, String path) {
+    public MediaRootDirectoryEntity(String name, MediaFileType mediaFileType, String path) {
+        this.name = name;
         this.mediaFileType = mediaFileType;
         this.directory = path;
     }
 
-    public Long getId() {
-        return id;
+    @Override
+    public String getName() {
+        return name;
     }
 
-    public String getDirectory() {
-        return directory;
-    }
-
-    public void setDirectory(String directory) {
-        this.directory = directory;
+    @Override
+    public File getDirectory() {
+        return new File(directory);
     }
 
     public MediaFileType getMediaFileType() {
         return mediaFileType;
     }
 
-    public void setMediaFileType(MediaFileType mediaFileType) {
-        this.mediaFileType = mediaFileType;
-    }
-
     @Override
     public int hashCode() {
         int hash = 7;
+        hash = 67 * hash + (this.name != null ? this.name.hashCode() : 0);
         hash = 67 * hash + (this.mediaFileType != null ? this.mediaFileType.hashCode() : 0);
         hash = 67 * hash + (this.directory != null ? this.directory.hashCode() : 0);
         return hash;
@@ -78,8 +82,11 @@ public class MediaFileRootDirectory implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final MediaFileRootDirectory other = (MediaFileRootDirectory) obj;
+        final MediaRootDirectoryEntity other = (MediaRootDirectoryEntity) obj;
         if (this.mediaFileType != other.mediaFileType) {
+            return false;
+        }
+        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
             return false;
         }
         if ((this.directory == null) ? (other.directory != null) : !this.directory.equals(other.directory)) {

@@ -1,6 +1,5 @@
 package de.gisdesign.nas.media.domain;
 
-import java.io.File;
 import java.util.List;
 import java.util.Set;
 
@@ -13,9 +12,21 @@ import java.util.Set;
 public interface MediaFileLibrary {
 
     /**
-     * Returns the {@link Set} of root directories.
+     * Returns the {@link MediaFileType} of this {@link MediaFileLibrary}.
+     * @return The {@link MediaFileType}.
+     */
+    public MediaFileType getMediaFileType();
+
+    /**
+     * Returns the name of this {@link MediaFileLibrary}.
+     * @return The name of the library.
+     */
+    public String getName();
+
+    /**
+     * Returns the {@link Set} of {@link MediaRootDirectory}s.
      * @return The root directories.
      */
-    public List<File> getRootDirectories();
+    public List<MediaRootDirectory> getRootDirectories();
 
 }

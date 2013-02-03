@@ -1,4 +1,4 @@
-package de.gisdesign.nas.media.admin;
+package de.gisdesign.nas.media.repo;
 
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 
@@ -8,6 +8,10 @@ import de.gisdesign.nas.media.domain.MediaFileLibrary;
  * @author Denis Pasek
  */
 public class InvalidRootDirectoryException extends Exception {
+    /**
+     * Serialization ID.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructs an instance of
