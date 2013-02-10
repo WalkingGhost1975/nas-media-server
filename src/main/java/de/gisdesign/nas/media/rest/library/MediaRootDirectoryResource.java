@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Denis Pasek, Senacor Technologies AG
+ * @author Denis Pasek
  */
 public class MediaRootDirectoryResource {
 

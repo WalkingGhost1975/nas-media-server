@@ -1,13 +1,9 @@
 package de.gisdesign.nas.media.repo.image;
 
-import de.gisdesign.nas.media.admin.ConfigurationService;
 import de.gisdesign.nas.media.domain.MediaFileType;
+import de.gisdesign.nas.media.repo.AbstractScanCronTrigger;
 import static de.gisdesign.nas.media.repo.image.Configuration.*;
-import java.util.Date;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.TriggerContext;
-import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,19 +11,11 @@ import org.springframework.stereotype.Component;
  * @author Denis Pasek
  */
 @Component
-public class ImageScanCronTrigger implements Trigger {
-
-    @Autowired
-    private ConfigurationService configurationService;
-
-    @Override
-    public Date nextExecutionTime(TriggerContext triggerContext) {
-        String imageScanCronExpression = configurationService.getConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_IMAGE_SCAN);
-        if (imageScanCronExpression == null)  {
-            imageScanCronExpression = (String) getDefault(CONFIG_PARAM_IMAGE_SCAN);
-            configurationService.setConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_IMAGE_SCAN, imageScanCronExpression);
-        }
-        CronTrigger cronTrigger = new CronTrigger(imageScanCronExpression);
-        return cronTrigger.nextExecutionTime(triggerContext);
+public class ImageScanCronTrigger extends AbstractScanCronTrigger {
+    /**
+     * Constructor.
+     */
+    public ImageScanCronTrigger() {
+        super(MediaFileType.IMAGE, CONFIG_PARAM_IMAGE_SCAN, String.valueOf(getDefault(CONFIG_PARAM_IMAGE_SCAN)));
     }
 }

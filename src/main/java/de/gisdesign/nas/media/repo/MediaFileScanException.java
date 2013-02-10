@@ -2,7 +2,7 @@ package de.gisdesign.nas.media.repo;
 
 /**
  * Exception to be thrown if scanning of media file is not successful.
- * @author Denis Pasek, Senacor Technologies AG
+ * @author Denis Pasek
  */
 public class MediaFileScanException extends Exception {
     /**

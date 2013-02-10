@@ -15,7 +15,7 @@ import org.apache.commons.lang.Validate;
 
 /**
  *
- * @author Denis Pasek, Senacor Technologies AG
+ * @author Denis Pasek
  */
 public class ImageResourceBuilder implements CatalogEntryResourceBuilder<ImageFileData> {
 

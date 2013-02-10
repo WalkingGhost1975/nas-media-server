@@ -1,8 +1,7 @@
-package de.gisdesign.nas.media.repo.image;
+package de.gisdesign.nas.media.repo.audio;
 
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
-import de.gisdesign.nas.media.domain.image.ImageFileData;
-import de.gisdesign.nas.media.domain.image.ImageMetaData;
+import de.gisdesign.nas.media.domain.audio.AudioFileData;
 import de.gisdesign.nas.media.repo.MetaDataQueryBuilder;
 import de.gisdesign.nas.media.repo.MetaDataQueryBuilderRegistry;
 import java.io.File;
@@ -23,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Denis Pasek
  */
 @Repository
-class ImageRepositoryDAOImpl implements ImageRepositoryDAO {
+class AudioRepositoryDAOImpl implements AudioRepositoryDAO {
 
     @PersistenceContext
     private EntityManager em;
@@ -32,68 +31,63 @@ class ImageRepositoryDAOImpl implements ImageRepositoryDAO {
     private MetaDataQueryBuilderRegistry queryBuilderRegistry;
 
     @Override
-    public List<ImageFileData> findImagesByDirectory(String directoryName) {
-        TypedQuery<ImageFileData> query = em.createQuery("SELECT ifd from ImageFileData ifd WHERE ifd.absolutePath=?1", ImageFileData.class);
+    public List<AudioFileData> findAudioFilesByDirectory(String directoryName) {
+        TypedQuery<AudioFileData> query = em.createQuery("SELECT afd from AudioFileData afd WHERE afd.absolutePath=?1", AudioFileData.class);
         query.setParameter(1, directoryName);
         return query.getResultList();
     }
 
     @Override
-    public ImageFileData findImageById(Long id) {
-        return em.find(ImageFileData.class, id);
+    public AudioFileData findAudioFileById(Long id) {
+        return em.find(AudioFileData.class, id);
     }
 
     @Override
-    public ImageFileData findImageByAbsoluteFileName(String absoluteFileName) {
+    public AudioFileData findAudioFileByAbsoluteFileName(String absoluteFileName) {
         File file = new File(absoluteFileName);
-        TypedQuery<ImageFileData> query = em.createQuery("SELECT ifd from ImageFileData ifd WHERE ifd.absolutePath=?1 AND ifd.filename=?2", ImageFileData.class);
+        TypedQuery<AudioFileData> query = em.createQuery("SELECT afd from AudioFileData afd WHERE afd.absolutePath=?1 AND afd.filename=?2", AudioFileData.class);
         query.setParameter(1, file.getParent());
         query.setParameter(2, file.getName());
         return query.getSingleResult();
     }
 
-    @Override
-    public ImageMetaData loadImageMetaDataById(Long id) {
-        return em.find(ImageMetaData.class, id);
-    }
-
     @Transactional
     @Override
-    public ImageFileData saveImage(ImageFileData imageFileData) {
-        ImageFileData savedData = imageFileData;
-        if (imageFileData.getId() != null)  {
-            savedData = em.merge(imageFileData);
+    public AudioFileData saveAudioFile(AudioFileData audioFileData) {
+        AudioFileData savedData = audioFileData;
+        if (audioFileData.getId() != null)  {
+            savedData = em.merge(audioFileData);
         } else {
-            em.persist(imageFileData);
+            em.persist(audioFileData);
         }
         return savedData;
     }
 
     @Transactional
     @Override
-    public void deleteImage(ImageFileData mediaFileData) {
-        ImageFileData imageFileData = em.merge(mediaFileData);
-        em.remove(imageFileData);
+    public void deleteAudioFile(AudioFileData mediaFileData) {
+        AudioFileData audioFileData = em.merge(mediaFileData);
+        em.remove(audioFileData);
     }
 
     @Override
-    public List<ImageFileData> findImagesByCriteria(final MetaDataCriteria criteria) {
+    public List<AudioFileData> findAudioFilesByCriteria(final MetaDataCriteria criteria) {
         //Prepare Query
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<ImageFileData> query = cb.createQuery(ImageFileData.class);
-        Root<ImageFileData> root = query.from(ImageFileData.class);
+        CriteriaQuery<AudioFileData> query = cb.createQuery(AudioFileData.class);
+        Root<AudioFileData> root = query.from(AudioFileData.class);
         query.select(root);
         Predicate filter = assembleQueryFilter(criteria, cb, root);
         return em.createQuery(query.where(filter)).getResultList();
     }
 
     @Override
-    public List<String> loadImageCriteriaValues(MetaDataCriteria criteria) {
+    public List<String> loadAudioFileCriteriaValues(MetaDataCriteria criteria) {
         MetaDataQueryBuilder queryBuilder = this.queryBuilderRegistry.getQueryBuilder(criteria.getMediaFileType(), criteria.getName());
         //Prepare Query
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Object> query = cb.createQuery();
-        Root<ImageFileData> root = query.from(ImageFileData.class);
+        Root<AudioFileData> root = query.from(AudioFileData.class);
         query.select(queryBuilder.buildExpression(cb, root));
         //Traverse parent criteria hierarchy
         MetaDataCriteria currentCriteria = criteria.getParent();
@@ -108,7 +102,7 @@ class ImageRepositoryDAOImpl implements ImageRepositoryDAO {
         return queryBuilder.convertCriteriaValues(criteriaValues);
     }
 
-    private Predicate assembleQueryFilter(final MetaDataCriteria criteria, CriteriaBuilder cb, Root<ImageFileData> root) {
+    private Predicate assembleQueryFilter(final MetaDataCriteria criteria, CriteriaBuilder cb, Root<AudioFileData> root) {
         //Traverse criteria hierarchy
         MetaDataCriteria currentCriteria = criteria;
         Predicate filter = null;
@@ -120,13 +114,4 @@ class ImageRepositoryDAOImpl implements ImageRepositoryDAO {
         }
         return filter;
     }
-
-    @Override
-    public List<ImageFileData> findImagesForRescaling(int index, int batchSize) {
-        TypedQuery<ImageFileData> query = em.createQuery("SELECT ifd FROM ImageFileData ifd ORDER BY ifd.absolutePath, ifd.filename", ImageFileData.class);
-        query.setFirstResult(index);
-        query.setMaxResults(batchSize);
-        return query.getResultList();
-    }
-
 }

@@ -2,7 +2,7 @@ package de.gisdesign.nas.media.rest.library;
 
 /**
  *
- * @author Denis Pasek, Senacor
+ * @author Denis Pasek
  */
 public class MediaLibraryLocationDTO {
 

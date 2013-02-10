@@ -3,6 +3,7 @@
   <persistence-unit name="MediaRepository" transaction-type="RESOURCE_LOCAL">
     <provider>org.hibernate.ejb.HibernatePersistence</provider>
     <non-jta-data-source>mediadb</non-jta-data-source>
+    <class>de.gisdesign.nas.media.domain.audio.AudioFileData</class>
     <class>de.gisdesign.nas.media.domain.image.ImageFileData</class>
     <class>de.gisdesign.nas.media.domain.image.ImageTag</class>
     <class>de.gisdesign.nas.media.admin.ConfigurationParameter</class>

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @author Denis Pasek, Senacor Technologies AG
+ * @author Denis Pasek
  */
 @Component
 class ImageTagCriteria implements MetaDataQueryBuilder {

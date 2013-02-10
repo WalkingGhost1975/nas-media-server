@@ -28,6 +28,9 @@
         <form action="<%= request.getContextPath() %>/repo/images/scan" method="post">
             <input type="submit" name="submit" value="ImageRepository scannen" />
         </form>
+        <form action="<%= request.getContextPath() %>/repo/audio/scan" method="post">
+            <input type="submit" name="submit" value="AudioRepository scannen" />
+        </form>
         <form name="tagsForm">
             <fieldset>
                 <div><input type="text" id="resource" name="resource" /></div>

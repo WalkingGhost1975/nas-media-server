@@ -14,7 +14,7 @@ import java.util.Map;
  * of these interfaces are specific to the various media types, e.g. images, music files
  * and videos.
  * @param <M> The supported type of {@link MediaFileData} for the {@link MediaRepository}.
- * @author Denis Pasek, Senacor Technologies AG
+ * @author Denis Pasek
  */
 public interface MediaRepository<M extends MediaFileData> {
 

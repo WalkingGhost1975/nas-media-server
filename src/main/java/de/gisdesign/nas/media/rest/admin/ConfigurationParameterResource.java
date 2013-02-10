@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Root REST resource wrapping the {@link MediaFileLibraryManager}.
- * @author Denis Pasek, Senacor Technologies AG
+ * @author Denis Pasek
  */
 @Component
 @Path("/admin")
