@@ -1,10 +1,12 @@
 package de.gisdesign.nas.media.admin;
 
 import de.gisdesign.nas.media.domain.MediaFileType;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,17 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     private EntityManager em;
 
     @Override
+    public List<ConfigurationParameter> getConfigurationParameters(MediaFileType mediaFileType) {
+        Validate.notNull(mediaFileType, "MediaFilyType is null.");
+        TypedQuery<ConfigurationParameter> query = em.createQuery("SELECT cp FROM ConfigurationParameter cp WHERE cp.mediaFileType=?1", ConfigurationParameter.class);
+        query.setParameter(1, mediaFileType);
+        return query.getResultList();
+    }
+
+    @Override
     public String getConfigurationParameter(MediaFileType mediaFileType, String parameterName) {
+        Validate.notNull(mediaFileType, "MediaFilyType is null.");
+        Validate.notNull(parameterName, "Parameter name is null.");
         ConfigurationParameter configParameter = loadConfigurationParameter(mediaFileType, parameterName);
         String configValue = (configParameter != null) ? configParameter.getValue() : null;
         LOG.debug("Loaded configuration parameter [{}:{}] with value [{}].", mediaFileType, parameterName, configValue);
@@ -36,6 +48,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Transactional
     @Override
     public void setConfigurationParameter(MediaFileType mediaFileType, String parameterName, String parameterValue) {
+        Validate.notNull(mediaFileType, "MediaFilyType is null.");
+        Validate.notNull(parameterName, "Parameter name is null.");
         ConfigurationParameter configParameter = loadConfigurationParameter(mediaFileType, parameterName);
         if (configParameter != null)  {
             configParameter.updateValue(parameterValue);

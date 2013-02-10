@@ -1,6 +1,7 @@
 package de.gisdesign.nas.media.admin;
 
 import de.gisdesign.nas.media.domain.MediaFileType;
+import java.util.List;
 
 /**
  * Service interface for the Media Repository. Allows management of the
@@ -8,6 +9,13 @@ import de.gisdesign.nas.media.domain.MediaFileType;
  * @author Denis Pasek
  */
 public interface ConfigurationService {
+
+    /**
+     * Retrieves all existing configuration parameters for the specified {@link MediaFileType}.
+     * @param mediaFileType The {@link MediaFileType}.
+     * @return The list of existing {@link ConfigurationParameter}s.
+     */
+    public List<ConfigurationParameter> getConfigurationParameters(MediaFileType mediaFileType);
 
     /**
      * Generic method used to load a {@link MediaFileType} specific configuration parameter.
