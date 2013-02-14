@@ -19,11 +19,11 @@ interface ImageRepositoryDAO {
 
     public List<ImageFileData> findImagesByDirectory(String directoryName);
 
-    public List<ImageFileData> findImagesByCriteria(MetaDataCriteria criteria);
+    public List<ImageFileData> findImagesByCriteria(MetaDataCriteria<?> criteria);
 
     public List<ImageFileData> findImagesForRescaling(int index, int batchSize);
 
-    public List<String> loadImageCriteriaValues(MetaDataCriteria criteria);
+    public List<String> loadImageCriteriaValues(MetaDataCriteria<?> criteria);
 
     public ImageFileData saveImage(ImageFileData imageFileData);
 

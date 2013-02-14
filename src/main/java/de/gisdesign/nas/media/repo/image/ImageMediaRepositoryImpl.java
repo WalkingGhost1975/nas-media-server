@@ -9,6 +9,7 @@ import de.gisdesign.nas.media.admin.ConfigurationService;
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
+import de.gisdesign.nas.media.domain.SingleValueMetaDataCriteria;
 import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
 import de.gisdesign.nas.media.domain.image.ColorSpace;
 import de.gisdesign.nas.media.domain.image.FlashMode;
@@ -155,13 +156,13 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
     }
 
     @Override
-    public List<MetaDataCriteria> loadMetaDataCriteriaOptions(MetaDataCriteria criteria) {
+    public List<SingleValueMetaDataCriteria> loadMetaDataCriteriaOptions(MetaDataCriteria<?> criteria) {
         List<String> criteriaValues = imageRepositoryDAO.loadImageCriteriaValues(criteria);
         LOG.debug("Loaded MetaDataCriteriaValues {} for MetaDataCriteria [{}]", criteriaValues, criteria.dumpHierarchy());
-        List<MetaDataCriteria> criteriaChildren = new ArrayList<MetaDataCriteria>(criteriaValues.size());
+        List<SingleValueMetaDataCriteria> criteriaChildren = new ArrayList<SingleValueMetaDataCriteria>(criteriaValues.size());
         for (String value : criteriaValues) {
-            MetaDataCriteria newMetaDataCriteria = new MetaDataCriteria(criteria.getMediaFileType(), criteria.getName());
-            newMetaDataCriteria.setValue(value);
+            SingleValueMetaDataCriteria newMetaDataCriteria = new SingleValueMetaDataCriteria(criteria.getMediaFileType(), criteria.getName());
+            newMetaDataCriteria.setValueAsString(value);
             if (criteria.getParent() != null)  {
                 newMetaDataCriteria.setParent(criteria.getParent());
             }

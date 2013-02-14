@@ -15,7 +15,7 @@ import javax.persistence.criteria.Root;
 public interface MetaDataQueryBuilder {
 
     /**
-     * String expression of unknonwn criteria value to be used. Usually maps to
+     * String expression of unknown criteria value to be used. Usually maps to
      * a query for null value.
      */
     public static final String UNKNOWN_VALUE = "%unknown%";
@@ -57,6 +57,6 @@ public interface MetaDataQueryBuilder {
      * @param criteriaValue The criteria value to match.
      * @return The search {@link Predicate}.
      */
-    public Predicate buildPredicate(CriteriaBuilder cb, Root<?> root, String criteriaValue);
+    public Predicate buildPredicate(CriteriaBuilder cb, Root<?> root, Object criteriaValue);
 
 }

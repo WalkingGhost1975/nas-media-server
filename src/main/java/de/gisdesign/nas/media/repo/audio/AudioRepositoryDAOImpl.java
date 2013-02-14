@@ -71,7 +71,7 @@ class AudioRepositoryDAOImpl implements AudioRepositoryDAO {
     }
 
     @Override
-    public List<AudioFileData> findAudioFilesByCriteria(final MetaDataCriteria criteria) {
+    public List<AudioFileData> findAudioFilesByCriteria(final MetaDataCriteria<?> criteria) {
         //Prepare Query
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<AudioFileData> query = cb.createQuery(AudioFileData.class);
@@ -82,7 +82,7 @@ class AudioRepositoryDAOImpl implements AudioRepositoryDAO {
     }
 
     @Override
-    public List<String> loadAudioFileCriteriaValues(MetaDataCriteria criteria) {
+    public List<String> loadAudioFileCriteriaValues(MetaDataCriteria<?> criteria) {
         MetaDataQueryBuilder queryBuilder = this.queryBuilderRegistry.getQueryBuilder(criteria.getMediaFileType(), criteria.getName());
         //Prepare Query
         CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -90,7 +90,7 @@ class AudioRepositoryDAOImpl implements AudioRepositoryDAO {
         Root<AudioFileData> root = query.from(AudioFileData.class);
         query.select(queryBuilder.buildExpression(cb, root));
         //Traverse parent criteria hierarchy
-        MetaDataCriteria currentCriteria = criteria.getParent();
+        MetaDataCriteria<?> currentCriteria = criteria.getParent();
         Predicate filter = assembleQueryFilter(currentCriteria, cb, root);
         //Assemble query
         if (filter != null)  {
@@ -102,9 +102,9 @@ class AudioRepositoryDAOImpl implements AudioRepositoryDAO {
         return queryBuilder.convertCriteriaValues(criteriaValues);
     }
 
-    private Predicate assembleQueryFilter(final MetaDataCriteria criteria, CriteriaBuilder cb, Root<AudioFileData> root) {
+    private Predicate assembleQueryFilter(final MetaDataCriteria<?> criteria, CriteriaBuilder cb, Root<AudioFileData> root) {
         //Traverse criteria hierarchy
-        MetaDataCriteria currentCriteria = criteria;
+        MetaDataCriteria<?> currentCriteria = criteria;
         Predicate filter = null;
         while (currentCriteria != null)  {
             MetaDataQueryBuilder queryCriteria = this.queryBuilderRegistry.getQueryBuilder(currentCriteria.getMediaFileType(), currentCriteria.getName());

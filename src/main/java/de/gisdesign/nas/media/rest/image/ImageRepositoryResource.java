@@ -1,7 +1,7 @@
 package de.gisdesign.nas.media.rest.image;
 
 import de.gisdesign.nas.media.domain.MediaFileType;
-import de.gisdesign.nas.media.domain.MetaDataCriteria;
+import de.gisdesign.nas.media.domain.SingleValueMetaDataCriteria;
 import de.gisdesign.nas.media.domain.catalog.CriteriaFolderCatalogEntry;
 import de.gisdesign.nas.media.domain.image.ImageFileData;
 import de.gisdesign.nas.media.repo.image.ImageFileScanner;
@@ -98,8 +98,8 @@ public class ImageRepositoryResource {
 
     @Path("/byYearAndMonth")
     public CatalogEntryFolderResource getByYearAndMonth() {
-        MetaDataCriteria yearCriteria = new MetaDataCriteria(MediaFileType.IMAGE, "creationDateYear");
-        MetaDataCriteria monthCriteria = new MetaDataCriteria(MediaFileType.IMAGE, "creationDateMonth");
+        SingleValueMetaDataCriteria yearCriteria = new SingleValueMetaDataCriteria(MediaFileType.IMAGE, "creationDateYear");
+        SingleValueMetaDataCriteria monthCriteria = new SingleValueMetaDataCriteria(MediaFileType.IMAGE, "creationDateMonth");
         yearCriteria.setChildCriteria(monthCriteria);
         CriteriaFolderCatalogEntry<ImageFileData> catalogEntry = new CriteriaFolderCatalogEntry<ImageFileData>(imageRepository, null, yearCriteria);
         return new CatalogEntryFolderResource(resourceBuilder, catalogEntry, uriInfo);
@@ -107,7 +107,7 @@ public class ImageRepositoryResource {
 
     @Path("/byTag")
     public CatalogEntryFolderResource getByTag() {
-        MetaDataCriteria tagLevel1Criteria = new MetaDataCriteria(MediaFileType.IMAGE, "tags");
+        SingleValueMetaDataCriteria tagLevel1Criteria = new SingleValueMetaDataCriteria(MediaFileType.IMAGE, "tags");
         CriteriaFolderCatalogEntry<ImageFileData> catalogEntry = new CriteriaFolderCatalogEntry<ImageFileData>(imageRepository, null, tagLevel1Criteria);
         return new CatalogEntryFolderResource(resourceBuilder, catalogEntry, uriInfo);
     }

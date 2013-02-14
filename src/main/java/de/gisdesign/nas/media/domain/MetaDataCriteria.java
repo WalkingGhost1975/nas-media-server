@@ -4,9 +4,10 @@ import org.apache.commons.lang.Validate;
 
 /**
  * Represents a node in a hierarchy of criteria used to match certain media files.
+ * @param <T> The type of value supported.
  * @author Denis Pasek
  */
-public class MetaDataCriteria {
+public abstract class MetaDataCriteria<T> {
 
     /**
      * The target {@link MediaFileType} of this criteria.
@@ -21,17 +22,17 @@ public class MetaDataCriteria {
     /**
      * The value of the criteria.
      */
-    private String value;
+    private T value;
 
     /**
      * The parent criteria.
      */
-    private MetaDataCriteria parent;
+    private MetaDataCriteria<?> parent;
 
     /**
      * The child criteria.
      */
-    private MetaDataCriteria childCriteria;
+    private MetaDataCriteria<?> childCriteria;
 
     /**
      * Constructor.
@@ -53,27 +54,31 @@ public class MetaDataCriteria {
         return name;
     }
 
-    public String getValue() {
+    public T getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(T value)  {
         this.value = value;
     }
 
-    public MetaDataCriteria getParent() {
+    public abstract String getValueAsString();
+
+    public abstract void setValueAsString(String value);
+
+    public MetaDataCriteria<?> getParent() {
         return parent;
     }
 
-    public void setParent(MetaDataCriteria parent) {
+    public void setParent(MetaDataCriteria<?> parent) {
         this.parent = parent;
     }
 
-    public MetaDataCriteria getChildCriteria() {
+    public MetaDataCriteria<?> getChildCriteria() {
         return childCriteria;
     }
 
-    public void setChildCriteria(MetaDataCriteria childCriteria) {
+    public void setChildCriteria(MetaDataCriteria<?> childCriteria) {
         this.childCriteria = childCriteria;
         this.childCriteria.setParent(this);
     }
@@ -92,8 +97,8 @@ public class MetaDataCriteria {
      * Performs a deep copy of this criteria and all the referenced child criteria.
      * @return The deep copy of this {@link MetaDataCriteria}.
      */
-    public MetaDataCriteria copy() {
-        MetaDataCriteria clone = new MetaDataCriteria(mediaFileType, name);
+    public MetaDataCriteria<T> copy() {
+        MetaDataCriteria<T> clone = createClone(mediaFileType, name);
         clone.value = value;
         clone.childCriteria = (childCriteria != null) ? childCriteria.copy() : null;
         return clone;
@@ -105,7 +110,7 @@ public class MetaDataCriteria {
      * @return The string representation of the {@link MetaDataCriteria} hierachy.
      */
     public String dumpHierarchy()  {
-        MetaDataCriteria currentCriteria = this;
+        MetaDataCriteria<?> currentCriteria = this;
         StringBuilder sb = new StringBuilder();
         int level = 0;
         while (currentCriteria != null) {
@@ -120,4 +125,13 @@ public class MetaDataCriteria {
         }
         return sb.toString();
     }
+
+    /**
+     * Template method to be implemented by subclass. Should instantiate a clone.
+     * It is not necessary to copy parent
+     * @param mediaFileType The {@link MediaFileType}.
+     * @param name The name of the criteria.
+     * @return The prepared clone.
+     */
+    protected abstract MetaDataCriteria<T> createClone(MediaFileType mediaFileType, String name);
 }

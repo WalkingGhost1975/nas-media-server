@@ -16,9 +16,9 @@ interface AudioRepositoryDAO {
 
     public List<AudioFileData> findAudioFilesByDirectory(String directoryName);
 
-    public List<AudioFileData> findAudioFilesByCriteria(MetaDataCriteria criteria);
+    public List<AudioFileData> findAudioFilesByCriteria(MetaDataCriteria<?> criteria);
 
-    public List<String> loadAudioFileCriteriaValues(MetaDataCriteria criteria);
+    public List<String> loadAudioFileCriteriaValues(MetaDataCriteria<?> criteria);
 
     public AudioFileData saveAudioFile(AudioFileData imageFileData);
 

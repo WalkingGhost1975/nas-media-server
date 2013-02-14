@@ -1,6 +1,7 @@
 package de.gisdesign.nas.media.repo.image;
 
 import de.gisdesign.nas.media.domain.MediaFileType;
+import de.gisdesign.nas.media.repo.SingleValueMetaDataQueryBuilderTemplate;
 import de.gisdesign.nas.media.repo.MetaDataQueryBuilder;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,40 +16,25 @@ import org.springframework.stereotype.Component;
  * @author Denis Pasek
  */
 @Component
-class ImageTagCriteria implements MetaDataQueryBuilder {
+public final class ImageTagCriteria extends SingleValueMetaDataQueryBuilderTemplate {
 
-    @Override
-    public MediaFileType getMediaFileType() {
-        return MediaFileType.IMAGE;
-    }
-
-    @Override
-    public String getName() {
-        return "tags";
-    }
-
-    @Override
-    public List<String> convertCriteriaValues(List<Object> criteriaObjects) {
-        List<String> criteriaValues = new ArrayList<String>(criteriaObjects.size());
-        for (Object value : criteriaObjects) {
-            if (value != null)  {
-                criteriaValues.add(String.valueOf(value));
-            } else {
-                criteriaValues.add(UNKNOWN_VALUE);
-            }
-        }
-        return criteriaValues;
-    }
-
-    @Override
-    public Predicate buildPredicate(CriteriaBuilder cb, Root<?> root, String criteriaValue) {
-        Predicate predicate = cb.equal(buildExpression(cb, root), criteriaValue);
-        return predicate;
+    public ImageTagCriteria() {
+        super(MediaFileType.IMAGE, "tags");
     }
 
     @Override
     public Expression<?> buildExpression(CriteriaBuilder cb, Root<?> root) {
         return root.join("tags").get("text");
+    }
+
+    @Override
+    protected String convertValueToString(Object criteriaValue) {
+        return String.valueOf(criteriaValue);
+    }
+
+    @Override
+    protected Object convertStringToValue(String stringValue) {
+        return stringValue;
     }
 
 }
