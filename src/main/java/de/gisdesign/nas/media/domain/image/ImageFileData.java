@@ -1,18 +1,15 @@
 package de.gisdesign.nas.media.domain.image;
 
-import de.gisdesign.nas.media.domain.MediaFileData;
+import de.gisdesign.nas.media.domain.MediaFileEntity;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -25,29 +22,12 @@ import org.apache.commons.lang.Validate;
  */
 @Entity
 @Table(name="IMAGE_FILE")
-public class ImageFileData implements MediaFileData, Serializable {
+public class ImageFileData extends MediaFileEntity implements Serializable {
 
     /**
      * Serialization ID.
      */
     private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue
-    @Column(name="ID")
-    private Long id;
-
-    @Column(name="LOCATION", length=1024)
-    private String absolutePath;
-
-    @Column(name="FILENAME")
-    private String filename;
-
-    @Column(name="RATING")
-    private Integer rating;
-
-    @Column(name="LAST_MODIFIED")
-    private Long lastModified;
 
     @Embedded
     private ImageMetaData metaData = new ImageMetaData();
@@ -55,42 +35,6 @@ public class ImageFileData implements MediaFileData, Serializable {
     @OneToMany(fetch= FetchType.EAGER, cascade= CascadeType.ALL, orphanRemoval=true)
     @JoinColumn(name="IMAGE_ID")
     private Set<ImageTag> tags = new TreeSet<ImageTag>();
-
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public String getAbsolutePath() {
-        return absolutePath;
-    }
-
-    public void setAbsolutePath(String absolutePath) {
-        this.absolutePath = absolutePath;
-    }
-
-    @Override
-    public String getFilename() {
-        return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-    @Override
-    public Long getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(Long lastModified) {
-        this.lastModified = lastModified;
-    }
-
-    @Override
-    public boolean hasChanged(long modificationTimestamp)  {
-        return (this.lastModified != null) ? (modificationTimestamp != this.lastModified) : true;
-    }
 
     /**
      * Generates the abstract file pointing at the slideshow image. It does NOT generate the image itself.
@@ -119,16 +63,6 @@ public class ImageFileData implements MediaFileData, Serializable {
             this.metaData = new ImageMetaData();
         }
         return metaData;
-    }
-
-    @Override
-    public Integer getRating() {
-        return rating;
-    }
-
-    @Override
-    public void setRating(Integer rating) {
-        this.rating = rating;
     }
 
     public void addTag(String text)  {

@@ -67,10 +67,7 @@ public class ImageTag implements Serializable, Comparable<ImageTag> {
         if (this.text == null)  {
             throw new IllegalStateException("Text of ImageTag is null.");
         }
-        int result = 0;
-        if (this.text != null) {
-            result = this.text.compareTo(o.text);
-        }
+        int result = this.text.compareTo(o.text);
         return result;
     }
 

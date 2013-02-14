@@ -36,6 +36,8 @@ public class ThumbGenerator {
             if (inputFile.isDirectory() || !inputFile.exists())  {
                 throw new IllegalArgumentException("Invalid input file [" + inputFileName + "].");
             }
+        } else {
+            throw new IllegalArgumentException("No input file defined!");
         }
         File outputDirectory = inputFile.getParentFile();
         ThumbGenerator generator = new ThumbGenerator();

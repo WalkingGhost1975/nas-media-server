@@ -115,7 +115,7 @@ public class MediaFileLibraryResource {
             LOG.debug("Deleted MediaFileLibrary [{}] of MediaFileType [{}].", mediaFileLibrary.getName(), mediaFileLibrary.getMediaFileType());
             response = Response.ok().build();
         } else {
-            LOG.warn("Cannot delete unknown MediaFileLibrary of MediaFileType [{}].", mediaFileLibrary.getMediaFileType());
+            LOG.warn("Cannot delete unknown MediaFileLibrary of MediaFileType [{}].", mediaFileType);
             response = Response.status(Response.Status.NOT_FOUND).build();
         }
         return response;

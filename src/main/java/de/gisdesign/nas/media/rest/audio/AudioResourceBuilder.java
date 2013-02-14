@@ -46,7 +46,7 @@ public class AudioResourceBuilder implements CatalogEntryResourceBuilder<AudioFi
         Validate.notNull(uri, "Uri is null.");
         AudioCatalogEntry audioEntry = (AudioCatalogEntry) catalogEntry;
 
-        AudioFileData audioFileData = audioEntry.getAudioFileData();
+        //AudioFileData audioFileData = audioEntry.getAudioFileData();
 
         AudioDTO audio = new AudioDTO(catalogEntry.getName(), uri, audioEntry.getLastModified(), audioEntry.getSize());
         //Set download link
