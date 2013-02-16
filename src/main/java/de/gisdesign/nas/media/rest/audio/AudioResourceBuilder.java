@@ -37,18 +37,17 @@ public class AudioResourceBuilder implements CatalogEntryResourceBuilder<AudioFi
     public MediaFileDTO buildMediaFile(CatalogEntry catalogEntry, UriInfo uriInfo) {
         Validate.notNull(catalogEntry, "CatalogEntry is null.");
         Validate.notNull(uriInfo, "UriInfo is null.");
-        String uri = uriInfo.getAbsolutePathBuilder().path(catalogEntry.getName()).build().toString();
-        return buildMediaFile(catalogEntry, uriInfo, uri);
+        AudioCatalogEntry audioEntry = (AudioCatalogEntry) catalogEntry;
+        String audioData = String.valueOf(audioEntry.getAudioFileData().getId());
+        String uri = uriInfo.getBaseUriBuilder().path("/audio/file").path(audioData).build().toString();
+        return buildMediaFile(audioEntry.getAudioFileData(), uriInfo, uri);
     }
 
-    public MediaFileDTO buildMediaFile(CatalogEntry catalogEntry, UriInfo uriInfo, String uri) {
-        Validate.notNull(catalogEntry, "CatalogEntry is null.");
+    public MediaFileDTO buildMediaFile(AudioFileData audioFileData, UriInfo uriInfo, String uri) {
+        Validate.notNull(audioFileData, "AudioFileData is null.");
         Validate.notNull(uri, "Uri is null.");
-        AudioCatalogEntry audioEntry = (AudioCatalogEntry) catalogEntry;
 
-        //AudioFileData audioFileData = audioEntry.getAudioFileData();
-
-        AudioDTO audio = new AudioDTO(catalogEntry.getName(), uri, audioEntry.getLastModified(), audioEntry.getSize());
+        AudioDTO audio = new AudioDTO(audioFileData.getFilename(), uri, audioFileData.getLastModified(), audioFileData.getSize());
         //Set download link
         audio.setDownloadUri(uriInfo.getAbsolutePathBuilder().path("/download").build().toString());
         //Set metadata link
@@ -61,7 +60,8 @@ public class AudioResourceBuilder implements CatalogEntryResourceBuilder<AudioFi
     public Object buildMediaFileResource(CatalogEntry catalogEntry, UriInfo uriInfo) {
         Validate.notNull(catalogEntry, "CatalogEntry is null.");
         Validate.notNull(uriInfo, "UriInfo is null.");
-        return new AudioFileResource(this, catalogEntry, uriInfo);
+        AudioFileData audioFileData = ((AudioCatalogEntry) catalogEntry).getAudioFileData();
+        return new AudioFileResource(this, audioFileData, uriInfo);
     }
 
 }

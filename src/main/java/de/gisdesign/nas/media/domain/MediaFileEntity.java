@@ -11,7 +11,7 @@ import javax.persistence.MappedSuperclass;
  * @author Denis Pasek
  */
 @MappedSuperclass
-public class MediaFileEntity implements MediaFileData, Serializable {
+public abstract class MediaFileEntity implements MediaFileData, Serializable {
     /**
      * Serialization ID.
      */
@@ -33,6 +33,9 @@ public class MediaFileEntity implements MediaFileData, Serializable {
 
     @Column(name="LAST_MODIFIED")
     private Long lastModified;
+
+    @Column(name="FILE_SIZE")
+    private Long size;
 
     public Long getId() {
         return id;
@@ -80,4 +83,12 @@ public class MediaFileEntity implements MediaFileData, Serializable {
         return (this.lastModified != null) ? (modificationTimestamp != this.lastModified) : true;
     }
 
+    @Override
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
+    }
 }

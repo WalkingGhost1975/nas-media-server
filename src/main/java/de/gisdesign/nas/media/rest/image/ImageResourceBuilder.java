@@ -41,37 +41,37 @@ public class ImageResourceBuilder implements CatalogEntryResourceBuilder<ImageFi
     public MediaFileDTO buildMediaFile(CatalogEntry catalogEntry, UriInfo uriInfo) {
         Validate.notNull(catalogEntry, "CatalogEntry is null.");
         Validate.notNull(uriInfo, "UriInfo is null.");
-        String uri = uriInfo.getAbsolutePathBuilder().path(catalogEntry.getName()).build().toString();
-        return buildMediaFile(catalogEntry, uriInfo, uri);
+        ImageCatalogEntry imageEntry = (ImageCatalogEntry) catalogEntry;
+        String imageId = String.valueOf(imageEntry.getImageData().getId());
+        String uri = uriInfo.getBaseUriBuilder().path("/images/file").path(imageId).build().toString();
+        return buildMediaFile(imageEntry.getImageData(), uriInfo, uri);
     }
 
-    public MediaFileDTO buildMediaFile(CatalogEntry catalogEntry, UriInfo uriInfo, String uri) {
-        Validate.notNull(catalogEntry, "CatalogEntry is null.");
+    public MediaFileDTO buildMediaFile(ImageFileData imageFileData, UriInfo uriInfo, String uri) {
+        Validate.notNull(imageFileData, "ImageFileData is null.");
         Validate.notNull(uri, "Uri is null.");
-        ImageCatalogEntry imageEntry = (ImageCatalogEntry) catalogEntry;
 
-        ImageFileData imageFileData = imageEntry.getImageData();
         ScaledImageResources imageResources = imageRepository.getScaledImageResources(imageFileData);
 
-        ImageDTO image = new ImageDTO(catalogEntry.getName(), uri, imageEntry.getLastModified(), imageEntry.getSize());
+        ImageDTO image = new ImageDTO(imageFileData.getFilename(), uri, imageFileData.getLastModified(), imageFileData.getSize());
         //Set download link
-        image.setDownloadUri(uriInfo.getAbsolutePathBuilder().path("/download").build().toString());
+        image.setDownloadUri(uri + "/download");
         //Set metadata link
-        image.setMetadataUri(uriInfo.getAbsolutePathBuilder().path("/metadata").build().toString());
+        image.setMetadataUri(uri + "/metadata");
 
         //Set slide show image resource URI
         if (imageResources.getSlideShowImage() != null)  {
-            image.setSlideShowUri(uriInfo.getAbsolutePathBuilder().path("/slide").build().toString());
+            image.setSlideShowUri(uri + "/slide");
         }
 
         //Set big thumb image resource URI
         if (imageResources.getThumbnailSmall() != null)  {
-            image.setThumbSmallUri(uriInfo.getAbsolutePathBuilder().path("/thumbSmall").build().toString());
+            image.setThumbSmallUri(uri + "/thumbSmall");
         }
 
         //Set big thumb image resource URI
         if (imageResources.getThumbnailBig() != null)  {
-            image.setThumbBigUri(uriInfo.getAbsolutePathBuilder().path("/thumbBig").build().toString());
+            image.setThumbBigUri(uri + "/thumbBig");
         }
         //Add image tags
         List<String> tags = new ArrayList<String>(imageFileData.getTags().size());
@@ -87,7 +87,8 @@ public class ImageResourceBuilder implements CatalogEntryResourceBuilder<ImageFi
     public Object buildMediaFileResource(CatalogEntry catalogEntry, UriInfo uriInfo) {
         Validate.notNull(catalogEntry, "CatalogEntry is null.");
         Validate.notNull(uriInfo, "UriInfo is null.");
-        return new ImageResource(this, catalogEntry, uriInfo);
+        ImageFileData imageFileData = ((ImageCatalogEntry)catalogEntry).getImageData();
+        return new ImageResource(this, imageFileData, uriInfo);
     }
 
 }

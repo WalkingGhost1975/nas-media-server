@@ -72,6 +72,12 @@ public class AudioMediaRepositoryImpl implements AudioMediaRepository {
     }
 
     @Override
+    public AudioFileData loadMediaFileData(Long id) {
+        Validate.notNull(id, "ID is null.");
+        return audioRepositoryDAO.findAudioFileById(id);
+    }
+
+    @Override
     public AudioFileData loadMediaFileData(File audioFile) {
         validateMediaFile(audioFile);
         return audioRepositoryDAO.findAudioFileByAbsoluteFileName(audioFile.getAbsolutePath());
@@ -87,6 +93,7 @@ public class AudioMediaRepositoryImpl implements AudioMediaRepository {
             audioData.setAbsolutePath(audioFile.getParent());
             audioData.setFilename(audioFile.getName());
             audioData.setLastModified(audioFile.lastModified());
+            audioData.setSize(audioFile.length());
             scanAudioFileMetaData(audioFile, audioData);
             audioData = audioRepositoryDAO.saveAudioFile(audioData);
         } else {
@@ -103,6 +110,7 @@ public class AudioMediaRepositoryImpl implements AudioMediaRepository {
         if (mediaFileData.hasChanged(audioFile.lastModified())) {
             scanAudioFileMetaData(audioFile, mediaFileData);
             mediaFileData.setLastModified(audioFile.lastModified());
+            mediaFileData.setSize(audioFile.length());
         }
         //Update sync ID and store metadata.
         AudioFileData updatedAudioFileData = audioRepositoryDAO.saveAudioFile(mediaFileData);

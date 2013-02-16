@@ -86,6 +86,12 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
     }
 
     @Override
+    public ImageFileData loadMediaFileData(Long id) {
+        Validate.notNull(id, "ID is null.");
+        return imageRepositoryDAO.findImageById(id);
+    }
+
+    @Override
     public ImageFileData loadMediaFileData(File imageFile) {
         validateMediaFile(imageFile);
         return imageRepositoryDAO.findImageByAbsoluteFileName(imageFile.getAbsolutePath());
@@ -101,6 +107,7 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
             imageData.setAbsolutePath(imageFile.getParent());
             imageData.setFilename(imageFile.getName());
             imageData.setLastModified(imageFile.lastModified());
+            imageData.setSize(imageFile.length());
             scanImageFileMetaData(imageFile, imageData);
             imageData = imageRepositoryDAO.saveImage(imageData);
         } else {
@@ -117,6 +124,7 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
         if (mediaFileData.hasChanged(imageFile.lastModified())) {
             scanImageFileMetaData(imageFile, mediaFileData);
             mediaFileData.setLastModified(imageFile.lastModified());
+            mediaFileData.setSize(imageFile.length());
         }
         //Update sync ID and store metadata.
         ImageFileData updatedImageFileData = imageRepositoryDAO.saveImage(mediaFileData);

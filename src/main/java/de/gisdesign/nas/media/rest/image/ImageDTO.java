@@ -24,7 +24,7 @@ public class ImageDTO extends MediaFileDTO {
         super(name, uri);
     }
 
-    public ImageDTO(String name, String uri, long lastModified, long size) {
+    public ImageDTO(String name, String uri, Long lastModified, Long size) {
         super(name, uri, lastModified, size);
     }
 

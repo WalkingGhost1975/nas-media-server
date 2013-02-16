@@ -57,6 +57,15 @@ public interface MediaRepository<M extends MediaFileData> {
 
     /**
      * Loads the basic information from the backing database for the
+     * given media file by the ID.
+     * @param id The id of the media file.
+     * @return The basic media file information or <code>null</code> if file
+     * cannot be found.
+     */
+    public M loadMediaFileData(Long id);
+
+    /**
+     * Loads the basic information from the backing database for the
      * given media file.
      * @param mediaFile The media file.
      * @return The basic media file information or <code>null</code> if file

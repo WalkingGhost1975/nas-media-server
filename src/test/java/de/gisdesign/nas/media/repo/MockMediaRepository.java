@@ -105,4 +105,9 @@ public class MockMediaRepository implements MediaRepository<ImageFileData> {
         return directory;
     }
 
+    @Override
+    public ImageFileData loadMediaFileData(Long id) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

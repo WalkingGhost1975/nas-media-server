@@ -15,8 +15,11 @@ import javax.annotation.PostConstruct;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +56,7 @@ public class ImageRepositoryResource {
     /**
      * The {@link CatalogEntryResourceBuilder}.
      */
-    private CatalogEntryResourceBuilder<ImageFileData> resourceBuilder;
+    private ImageResourceBuilder resourceBuilder;
     /**
      * The REST {@link UriInfo} of this resource.
      */
@@ -110,6 +113,21 @@ public class ImageRepositoryResource {
         SingleValueMetaDataCriteria tagLevel1Criteria = new SingleValueMetaDataCriteria(MediaFileType.IMAGE, "tags");
         CriteriaFolderCatalogEntry<ImageFileData> catalogEntry = new CriteriaFolderCatalogEntry<ImageFileData>(imageRepository, null, tagLevel1Criteria);
         return new CatalogEntryFolderResource(resourceBuilder, catalogEntry, uriInfo);
+    }
+
+    /**
+     * Retrievs the REST resource for an audio file identified by the unique ID of the file.
+     * @param id The ID of the media file.
+     * @return The {@link AudioFileResource}.
+     */
+    @Path("/file/{id}")
+    public ImageResource getById(@PathParam("id") Long id) {
+        LOG.debug("Creating AudioFileResource.");
+        ImageFileData imageFileData = imageRepository.loadMediaFileData(id);
+        if (imageFileData == null)  {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        return new ImageResource(resourceBuilder, imageFileData, uriInfo);
     }
 
     @POST

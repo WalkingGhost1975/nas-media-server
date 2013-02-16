@@ -1,9 +1,7 @@
 package de.gisdesign.nas.media.rest.audio;
 
-import de.gisdesign.nas.media.domain.audio.AudioCatalogEntry;
 import de.gisdesign.nas.media.domain.audio.AudioFileData;
 import de.gisdesign.nas.media.domain.audio.AudioMetaData;
-import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
 import de.gisdesign.nas.media.repo.audio.AudioMediaRepository;
 import de.gisdesign.nas.media.rest.MediaFileDTO;
 import java.io.File;
@@ -27,33 +25,31 @@ public class AudioFileResource {
     private static final Logger LOG = LoggerFactory.getLogger(AudioFileResource.class);
 
     private UriInfo uriInfo;
-    private AudioCatalogEntry audioEntry;
     private AudioFileData audioFileData;
     private AudioResourceBuilder resourceBuilder;
 
-    public AudioFileResource(AudioResourceBuilder resourceBuilder, CatalogEntry catalogEntry, UriInfo uriInfo) {
+    public AudioFileResource(AudioResourceBuilder resourceBuilder, AudioFileData audioFileData, UriInfo uriInfo) {
         Validate.notNull(resourceBuilder, "AudioResourceBuilder is null.");
-        Validate.notNull(catalogEntry, "CatalogEntry is null.");
-        Validate.isTrue(AudioCatalogEntry.class.isAssignableFrom(catalogEntry.getClass()), "Expected AudioCatalogEntry type.");
+        Validate.notNull(audioFileData, "AudioFileData is null.");
         Validate.notNull(uriInfo, "UriInfo is null.");
         this.resourceBuilder = resourceBuilder;
-        this.audioEntry = (AudioCatalogEntry) catalogEntry;
-        this.audioFileData = audioEntry.getAudioFileData();
+        this.audioFileData = audioFileData;
         this.uriInfo = uriInfo;
     }
 
     @GET
     @Produces("application/json; charset=UTF-8")
     public MediaFileDTO getAudioNode() {
-        String uri = uriInfo.getAbsolutePathBuilder().build().toString();
-        return resourceBuilder.buildMediaFile(audioEntry, uriInfo, uri);
+        String audioId = String.valueOf(audioFileData.getId());
+        String uri = uriInfo.getBaseUriBuilder().path("/audio/file").path(audioId).build().toString();
+        return resourceBuilder.buildMediaFile(audioFileData, uriInfo, uri);
     }
 
     @GET
     @Path("/metadata")
     @Produces("application/json; charset=UTF-8")
     public AudioMetaData getAudioDetails() {
-        return audioEntry.getAudioFileData().getMetaData();
+        return audioFileData.getMetaData();
     }
 
     @GET

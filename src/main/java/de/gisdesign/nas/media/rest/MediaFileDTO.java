@@ -1,16 +1,14 @@
 package de.gisdesign.nas.media.rest;
 
-import java.util.List;
-
 /**
  *
  * @author Denis Pasek
  */
 public class MediaFileDTO extends NodeDTO {
 
-    private long lastModified;
+    private Long lastModified;
 
-    private long size;
+    private Long size;
 
     private String metadataUri;
 
@@ -23,26 +21,26 @@ public class MediaFileDTO extends NodeDTO {
         super(name, uri);
     }
 
-    public MediaFileDTO(String name, String uri, long lastModified, long size) {
+    public MediaFileDTO(String name, String uri, Long lastModified, Long size) {
         super(name, uri);
         this.lastModified = lastModified;
         this.size = size;
         this.downloadUri = uri + "/download";
     }
 
-    public long getLastModified() {
+    public Long getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(long lastModified) {
+    public void setLastModified(Long lastModified) {
         this.lastModified = lastModified;
     }
 
-    public long getSize() {
+    public Long getSize() {
         return size;
     }
 
-    public void setSize(long size) {
+    public void setSize(Long size) {
         this.size = size;
     }
 

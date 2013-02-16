@@ -1,7 +1,5 @@
 package de.gisdesign.nas.media.rest.image;
 
-import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
-import de.gisdesign.nas.media.domain.image.ImageCatalogEntry;
 import de.gisdesign.nas.media.domain.image.ImageFileData;
 import de.gisdesign.nas.media.domain.image.ImageMetaData;
 import de.gisdesign.nas.media.repo.MediaFileScanException;
@@ -33,20 +31,17 @@ public class ImageResource {
     private static final Logger LOG = LoggerFactory.getLogger(ImageResource.class);
 
     private UriInfo uriInfo;
-    private ImageCatalogEntry imageEntry;
     private ImageFileData imageFileData;
     private ImageResourceBuilder resourceBuilder;
     private ImageMediaRepository imageRepository;
 
-    public ImageResource(ImageResourceBuilder resourceBuilder, CatalogEntry catalogEntry, UriInfo uriInfo) {
+    public ImageResource(ImageResourceBuilder resourceBuilder, ImageFileData imageFileData, UriInfo uriInfo) {
         Validate.notNull(resourceBuilder, "ImageResourceBuilder is null.");
-        Validate.notNull(catalogEntry, "CatalogEntry is null.");
-        Validate.isTrue(ImageCatalogEntry.class.isAssignableFrom(catalogEntry.getClass()), "Expected ImageCatalogEntry type.");
+        Validate.notNull(imageFileData, "ImageFileData is null.");
         Validate.notNull(uriInfo, "UriInfo is null.");
         this.resourceBuilder = resourceBuilder;
         this.imageRepository = resourceBuilder.getImageRepository();
-        this.imageEntry = (ImageCatalogEntry) catalogEntry;
-        this.imageFileData = imageEntry.getImageData();
+        this.imageFileData = imageFileData;
         this.uriInfo = uriInfo;
     }
 
@@ -71,15 +66,16 @@ public class ImageResource {
     @GET
     @Produces("application/json; charset=UTF-8")
     public MediaFileDTO getImageNode() {
-        String uri = uriInfo.getAbsolutePathBuilder().build().toString();
-        return resourceBuilder.buildMediaFile(imageEntry, uriInfo, uri);
+        String imageId = String.valueOf(imageFileData.getId());
+        String uri = uriInfo.getBaseUriBuilder().path("/images/file").path(imageId).build().toString();
+        return resourceBuilder.buildMediaFile(imageFileData, uriInfo, uri);
     }
 
     @GET
     @Path("/metadata")
     @Produces("application/json; charset=UTF-8")
     public ImageMetaData getImageDetails() {
-        return imageEntry.getImageData().getMetaData();
+        return imageFileData.getMetaData();
     }
 
     @GET

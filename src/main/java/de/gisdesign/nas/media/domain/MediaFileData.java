@@ -19,6 +19,12 @@ public interface MediaFileData {
     public String getFilename();
 
     /**
+     * Returns the file size of the media file in bytes.
+     * @return The size of the file.
+     */
+    public Long getSize();
+
+    /**
      * Returns the last modification timestamp of the media file.
      * @return The last modification timestamp.
      */

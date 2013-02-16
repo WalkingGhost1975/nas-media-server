@@ -11,8 +11,11 @@ import javax.annotation.PostConstruct;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +50,9 @@ public class AudioRepositoryResource {
     private AudioFileScanner audioFileScanner;
 
     /**
-     * The {@link CatalogEntryResourceBuilder}.
+     * The {@link AudioResourceBuilder}.
      */
-    private CatalogEntryResourceBuilder<AudioFileData> resourceBuilder;
+    private AudioResourceBuilder resourceBuilder;
     /**
      * The REST {@link UriInfo} of this resource.
      */
@@ -86,6 +89,21 @@ public class AudioRepositoryResource {
     public AudioLibrariesResource getLibrary() {
         LOG.debug("Creating AudioLibrariesResource.");
         return new AudioLibrariesResource(audioRepository, uriInfo);
+    }
+
+    /**
+     * Retrievs the REST resource for an audio file identified by the unique ID of the file.
+     * @param id The ID of the media file.
+     * @return The {@link AudioFileResource}.
+     */
+    @Path("/file/{id}")
+    public AudioFileResource getById(@PathParam("id") Long id) {
+        LOG.debug("Creating AudioFileResource.");
+        AudioFileData audioFileData = audioRepository.loadMediaFileData(id);
+        if (audioFileData == null)  {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        return new AudioFileResource(resourceBuilder, audioFileData, uriInfo);
     }
 
     @POST
