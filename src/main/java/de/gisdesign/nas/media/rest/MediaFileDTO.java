@@ -4,7 +4,7 @@ package de.gisdesign.nas.media.rest;
  *
  * @author Denis Pasek
  */
-public class MediaFileDTO extends NodeDTO {
+public abstract class MediaFileDTO extends NodeDTO {
 
     private Long lastModified;
 

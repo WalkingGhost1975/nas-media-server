@@ -1,11 +1,13 @@
 package de.gisdesign.nas.media.rest.library;
 
 import de.gisdesign.nas.media.domain.MediaRootDirectory;
+import org.codehaus.jackson.annotate.JsonTypeName;
 
 /**
  * REST DTO representing a {@link MediaRootDirectory}.
  * @author Denis Pasek
  */
+@JsonTypeName("MediaRootDirectory")
 public class MediaRootDirectoryDTO {
 
     private String name;

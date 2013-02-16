@@ -1,11 +1,13 @@
 package de.gisdesign.nas.media.rest.audio;
 
 import de.gisdesign.nas.media.rest.MediaFileDTO;
+import org.codehaus.jackson.annotate.JsonTypeName;
 
 /**
  * REST service DTO for Audio File resources.
  * @author Denis PasekS
  */
+@JsonTypeName("AudioFile")
 public class AudioDTO extends MediaFileDTO {
 
     private String artist;

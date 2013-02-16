@@ -1,9 +1,12 @@
 package de.gisdesign.nas.media.rest.library;
 
+import org.codehaus.jackson.annotate.JsonTypeName;
+
 /**
  *
  * @author Denis Pasek
  */
+@JsonTypeName("MediaLibraryLocation")
 public class MediaLibraryLocationDTO {
 
     private String name;

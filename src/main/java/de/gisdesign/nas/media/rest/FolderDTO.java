@@ -1,9 +1,12 @@
 package de.gisdesign.nas.media.rest;
 
+import org.codehaus.jackson.annotate.JsonTypeName;
+
 /**
  * {@link Node} implementation representing a folder containg subfolders and media files.
  * @author Denis Pasek
  */
+@JsonTypeName("Folder")
 public class FolderDTO extends NodeDTO {
 
     private String category;

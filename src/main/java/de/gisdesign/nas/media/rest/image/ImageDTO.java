@@ -2,11 +2,13 @@ package de.gisdesign.nas.media.rest.image;
 
 import de.gisdesign.nas.media.rest.MediaFileDTO;
 import java.util.List;
+import org.codehaus.jackson.annotate.JsonTypeName;
 
 /**
  * REST service DTO for Image resources.
  * @author Denis PasekS
  */
+@JsonTypeName("Image")
 public class ImageDTO extends MediaFileDTO {
 
     private String thumbSmallUri;
