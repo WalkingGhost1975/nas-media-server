@@ -1,7 +1,7 @@
-package de.gisdesign.nas.media.repo.image;
+package de.gisdesign.nas.media.repo.image.criteria;
 
 import de.gisdesign.nas.media.domain.MediaFileType;
-import de.gisdesign.nas.media.repo.SingleValueMetaDataQueryBuilderTemplate;
+import de.gisdesign.nas.media.repo.CatalogMetaDataQueryBuilderTemplate;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
@@ -11,25 +11,20 @@ import org.springframework.stereotype.Component;
  *
  * @author Denis Pasek
  */
-@Component
-public final class ImageYearCriteria extends SingleValueMetaDataQueryBuilderTemplate {
+@Component("image:creationDateYear")
+public final class YearCriteria extends CatalogMetaDataQueryBuilderTemplate {
 
-    public ImageYearCriteria() {
+    public YearCriteria() {
         super(MediaFileType.IMAGE, "creationDateYear");
     }
 
     @Override
-    public Expression<?> buildExpression(CriteriaBuilder cb, Root<?> root) {
+    public Expression<Integer> buildExpression(CriteriaBuilder cb, Root<?> root) {
         return cb.function("year", Integer.class, root.get("metaData").get("creationDate"));
     }
 
     @Override
-    protected String convertValueToString(Object criteriaValue) {
-        return String.valueOf(criteriaValue);
-    }
-
-    @Override
-    protected Object convertStringToValue(String stringValue) {
+    protected Integer convertStringToValue(String stringValue) {
         return Integer.parseInt(stringValue);
     }
 }

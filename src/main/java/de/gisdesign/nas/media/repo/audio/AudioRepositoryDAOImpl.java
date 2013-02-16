@@ -2,6 +2,7 @@ package de.gisdesign.nas.media.repo.audio;
 
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
 import de.gisdesign.nas.media.domain.audio.AudioFileData;
+import de.gisdesign.nas.media.repo.CatalogMetaDataQueryBuilder;
 import de.gisdesign.nas.media.repo.MetaDataQueryBuilder;
 import de.gisdesign.nas.media.repo.MetaDataQueryBuilderRegistry;
 import java.io.File;
@@ -83,7 +84,7 @@ class AudioRepositoryDAOImpl implements AudioRepositoryDAO {
 
     @Override
     public List<String> loadAudioFileCriteriaValues(MetaDataCriteria<?> criteria) {
-        MetaDataQueryBuilder queryBuilder = this.queryBuilderRegistry.getQueryBuilder(criteria.getMediaFileType(), criteria.getName());
+        CatalogMetaDataQueryBuilder queryBuilder = this.queryBuilderRegistry.getQueryBuilder(criteria.getMediaFileType(), criteria.getName(), CatalogMetaDataQueryBuilder.class);
         //Prepare Query
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Object> query = cb.createQuery();
@@ -107,7 +108,7 @@ class AudioRepositoryDAOImpl implements AudioRepositoryDAO {
         MetaDataCriteria<?> currentCriteria = criteria;
         Predicate filter = null;
         while (currentCriteria != null)  {
-            MetaDataQueryBuilder queryCriteria = this.queryBuilderRegistry.getQueryBuilder(currentCriteria.getMediaFileType(), currentCriteria.getName());
+            MetaDataQueryBuilder queryCriteria = this.queryBuilderRegistry.getQueryBuilder(currentCriteria.getMediaFileType(), currentCriteria.getName(), MetaDataQueryBuilder.class);
             Predicate filterPredicate = queryCriteria.buildPredicate(cb, root, currentCriteria.getValue());
             filter = (filter == null) ? filterPredicate : cb.and(filter,filterPredicate);
             currentCriteria = currentCriteria.getParent();

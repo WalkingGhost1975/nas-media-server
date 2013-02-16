@@ -2,11 +2,8 @@ package de.gisdesign.nas.media.domain.audio;
 
 import de.gisdesign.nas.media.domain.MediaFileEntity;
 import java.io.Serializable;
-import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**

@@ -1,7 +1,6 @@
 package de.gisdesign.nas.media.repo;
 
 import de.gisdesign.nas.media.domain.MediaFileType;
-import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
@@ -15,12 +14,6 @@ import javax.persistence.criteria.Root;
 public interface MetaDataQueryBuilder {
 
     /**
-     * String expression of unknown criteria value to be used. Usually maps to
-     * a query for null value.
-     */
-    public static final String UNKNOWN_VALUE = "%unknown%";
-
-    /**
      * Returns the target {@link MediaFileType} of this {@link QueryCriteria}.
      * @return The {@link MediaFileType}.
      */
@@ -32,14 +25,6 @@ public interface MetaDataQueryBuilder {
      * @return The name of {@link QueryCriteria}.
      */
     public String getName();
-
-    /**
-     * Converts the criteria values extracted from the database into the string
-     * representations.
-     * @param criteriaObjects The list of criteria values as extracted from the database.
-     * @return The criteria values in the string representation.
-     */
-    public List<String> convertCriteriaValues(List<Object> criteriaObjects);
 
     /**
      * Builds an {@link Expression} for the criteria. This expression refers to the entity

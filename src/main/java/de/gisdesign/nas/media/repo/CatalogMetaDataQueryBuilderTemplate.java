@@ -12,7 +12,7 @@ import org.apache.commons.lang.Validate;
  *
  * @author Denis Pasek
  */
-public abstract class SingleValueMetaDataQueryBuilderTemplate implements MetaDataQueryBuilder {
+public abstract class CatalogMetaDataQueryBuilderTemplate implements CatalogMetaDataQueryBuilder {
 
     /**
      * The {@link MediaFileType}.
@@ -24,7 +24,7 @@ public abstract class SingleValueMetaDataQueryBuilderTemplate implements MetaDat
      */
     private String name;
 
-    public SingleValueMetaDataQueryBuilderTemplate(MediaFileType mediaFileType, String name) {
+    public CatalogMetaDataQueryBuilderTemplate(MediaFileType mediaFileType, String name) {
         Validate.notNull(mediaFileType, "MediaFileType is null.");
         Validate.notEmpty(name, "Name is empty.");
         this.mediaFileType = mediaFileType;
@@ -42,7 +42,7 @@ public abstract class SingleValueMetaDataQueryBuilderTemplate implements MetaDat
     }
 
     @Override
-    public List<String> convertCriteriaValues(List<Object> criteriaObjects) {
+    public List<String> convertCriteriaValues(List<?> criteriaObjects) {
         List<String> criteriaValues = new ArrayList<String>(criteriaObjects.size());
         for (Object value : criteriaObjects) {
             if (value != null)  {
@@ -70,7 +70,9 @@ public abstract class SingleValueMetaDataQueryBuilderTemplate implements MetaDat
      * @param criteriaValue The criteria value.
      * @return The String representation.
      */
-    protected abstract String convertValueToString(Object criteriaValue);
+    protected String convertValueToString(Object criteriaValue) {
+        return String.valueOf(criteriaValue);
+    }
 
     /**
      * Template method to be implemented by subclasses to convert the criteria

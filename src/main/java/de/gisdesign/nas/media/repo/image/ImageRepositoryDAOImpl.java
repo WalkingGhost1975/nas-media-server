@@ -3,6 +3,7 @@ package de.gisdesign.nas.media.repo.image;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
 import de.gisdesign.nas.media.domain.image.ImageFileData;
 import de.gisdesign.nas.media.domain.image.ImageMetaData;
+import de.gisdesign.nas.media.repo.CatalogMetaDataQueryBuilder;
 import de.gisdesign.nas.media.repo.MetaDataQueryBuilder;
 import de.gisdesign.nas.media.repo.MetaDataQueryBuilderRegistry;
 import java.io.File;
@@ -89,7 +90,7 @@ class ImageRepositoryDAOImpl implements ImageRepositoryDAO {
 
     @Override
     public List<String> loadImageCriteriaValues(MetaDataCriteria<?> criteria) {
-        MetaDataQueryBuilder queryBuilder = this.queryBuilderRegistry.getQueryBuilder(criteria.getMediaFileType(), criteria.getName());
+        CatalogMetaDataQueryBuilder queryBuilder = this.queryBuilderRegistry.getQueryBuilder(criteria.getMediaFileType(), criteria.getName(), CatalogMetaDataQueryBuilder.class);
         //Prepare Query
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Object> query = cb.createQuery();
@@ -113,7 +114,7 @@ class ImageRepositoryDAOImpl implements ImageRepositoryDAO {
         MetaDataCriteria<?> currentCriteria = criteria;
         Predicate filter = null;
         while (currentCriteria != null)  {
-            MetaDataQueryBuilder queryCriteria = this.queryBuilderRegistry.getQueryBuilder(currentCriteria.getMediaFileType(), currentCriteria.getName());
+            MetaDataQueryBuilder queryCriteria = this.queryBuilderRegistry.getQueryBuilder(currentCriteria.getMediaFileType(), currentCriteria.getName(), MetaDataQueryBuilder.class);
             Predicate filterPredicate = queryCriteria.buildPredicate(cb, root, currentCriteria.getValue());
             filter = (filter == null) ? filterPredicate : cb.and(filter,filterPredicate);
             currentCriteria = currentCriteria.getParent();
