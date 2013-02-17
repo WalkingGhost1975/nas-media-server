@@ -1,6 +1,5 @@
 package de.gisdesign.nas.media.repo;
 
-import de.gisdesign.nas.media.domain.MediaFileType;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
@@ -11,20 +10,7 @@ import javax.persistence.criteria.Root;
  * used to matched certain media files based on the criteria value.
  * @author Denis Pasek
  */
-public interface MetaDataQueryBuilder {
-
-    /**
-     * Returns the target {@link MediaFileType} of this {@link QueryCriteria}.
-     * @return The {@link MediaFileType}.
-     */
-    public MediaFileType getMediaFileType();
-
-    /**
-     * Returns the name of the {@link QueryCriteria}. Used for registering the
-     * {@link QueryCriteria} for usage in navigation structure definitions.
-     * @return The name of {@link QueryCriteria}.
-     */
-    public String getName();
+public interface MetaDataQueryBuilder<T> {
 
     /**
      * Builds an {@link Expression} for the criteria. This expression refers to the entity
@@ -42,6 +28,6 @@ public interface MetaDataQueryBuilder {
      * @param criteriaValue The criteria value to match.
      * @return The search {@link Predicate}.
      */
-    public Predicate buildPredicate(CriteriaBuilder cb, Root<?> root, Object criteriaValue);
+    public Predicate buildPredicate(CriteriaBuilder cb, Root<?> root, T criteriaValue);
 
 }

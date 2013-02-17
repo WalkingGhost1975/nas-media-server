@@ -9,7 +9,7 @@ import de.gisdesign.nas.media.admin.ConfigurationService;
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
-import de.gisdesign.nas.media.domain.SingleValueMetaDataCriteria;
+import de.gisdesign.nas.media.domain.DiscreteValueMetaDataCriteria;
 import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
 import de.gisdesign.nas.media.domain.image.ColorSpace;
 import de.gisdesign.nas.media.domain.image.FlashMode;
@@ -157,20 +157,20 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
     }
 
     @Override
-    public List<ImageFileData> findMediaFilesByCriteria(MetaDataCriteria criteria) {
+    public List<ImageFileData> findMediaFilesByCriteria(MetaDataCriteria<?> criteria) {
         List<ImageFileData> imageFiles = imageRepositoryDAO.findImagesByCriteria(criteria);
         LOG.debug("Loaded [{}] Image files for MetaDataCriteria [{}]", imageFiles.size(), criteria.dumpHierarchy());
         return imageFiles;
     }
 
     @Override
-    public List<SingleValueMetaDataCriteria> loadMetaDataCriteriaOptions(MetaDataCriteria<?> criteria) {
+    public List<DiscreteValueMetaDataCriteria> loadMetaDataCriteriaOptions(MetaDataCriteria<?> criteria) {
         List<String> criteriaValues = imageRepositoryDAO.loadImageCriteriaValues(criteria);
         LOG.debug("Loaded MetaDataCriteriaValues {} for MetaDataCriteria [{}]", criteriaValues, criteria.dumpHierarchy());
-        List<SingleValueMetaDataCriteria> criteriaChildren = new ArrayList<SingleValueMetaDataCriteria>(criteriaValues.size());
+        List<DiscreteValueMetaDataCriteria> criteriaChildren = new ArrayList<DiscreteValueMetaDataCriteria>(criteriaValues.size());
         for (String value : criteriaValues) {
-            SingleValueMetaDataCriteria newMetaDataCriteria = new SingleValueMetaDataCriteria(criteria.getMediaFileType(), criteria.getName());
-            newMetaDataCriteria.setValueAsString(value);
+            DiscreteValueMetaDataCriteria newMetaDataCriteria = new DiscreteValueMetaDataCriteria(criteria.getId());
+            newMetaDataCriteria.setValue(value);
             if (criteria.getParent() != null)  {
                 newMetaDataCriteria.setParent(criteria.getParent());
             }

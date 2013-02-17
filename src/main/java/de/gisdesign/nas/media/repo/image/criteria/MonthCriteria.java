@@ -1,7 +1,6 @@
 package de.gisdesign.nas.media.repo.image.criteria;
 
-import de.gisdesign.nas.media.domain.MediaFileType;
-import de.gisdesign.nas.media.repo.CatalogMetaDataQueryBuilderTemplate;
+import de.gisdesign.nas.media.repo.DiscreteValueMetaDataQueryBuilderTemplate;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
@@ -13,11 +12,7 @@ import org.springframework.stereotype.Component;
  * @author Denis Pasek
  */
 @Component("image:creationDateMonth")
-public final class MonthCriteria extends CatalogMetaDataQueryBuilderTemplate {
-
-    public MonthCriteria() {
-        super(MediaFileType.IMAGE, "creationDateMonth");
-    }
+public final class MonthCriteria extends DiscreteValueMetaDataQueryBuilderTemplate<Integer> {
 
     @Override
     public Expression<Integer> buildExpression(CriteriaBuilder cb, Root<?> root) {
@@ -25,7 +20,7 @@ public final class MonthCriteria extends CatalogMetaDataQueryBuilderTemplate {
     }
 
     @Override
-    protected String convertValueToString(Object criteriaValue) {
+    protected String convertValueToString(Integer criteriaValue) {
         return StringUtils.leftPad(String.valueOf(criteriaValue), 2, '0');
     }
 

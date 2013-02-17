@@ -10,14 +10,9 @@ import org.apache.commons.lang.Validate;
 public abstract class MetaDataCriteria<T> {
 
     /**
-     * The target {@link MediaFileType} of this criteria.
+     * The ID of the criteria.
      */
-    private MediaFileType mediaFileType;
-
-    /**
-     * The name of the criteria.
-     */
-    private String name;
+    private String id;
 
     /**
      * The value of the criteria.
@@ -36,22 +31,15 @@ public abstract class MetaDataCriteria<T> {
 
     /**
      * Constructor.
-     * @param mediaFileType The target {@link MediaFileType}.
-     * @param criteriaName The name of the criteria.
+     * @param id The ID of the criteria.
      */
-    public MetaDataCriteria(MediaFileType mediaFileType, String criteriaName) {
-        Validate.notNull(mediaFileType, "MediaFileType is null.");
-        Validate.notNull(criteriaName, "MetaDataCriteria name is null.");
-        this.mediaFileType = mediaFileType;
-        this.name = criteriaName;
+    public MetaDataCriteria(String id) {
+        Validate.notNull(id, "ID is null.");
+        this.id = id;
     }
 
-    public MediaFileType getMediaFileType() {
-        return mediaFileType;
-    }
-
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
     public T getValue() {
@@ -63,8 +51,6 @@ public abstract class MetaDataCriteria<T> {
     }
 
     public abstract String getValueAsString();
-
-    public abstract void setValueAsString(String value);
 
     public MetaDataCriteria<?> getParent() {
         return parent;
@@ -98,7 +84,7 @@ public abstract class MetaDataCriteria<T> {
      * @return The deep copy of this {@link MetaDataCriteria}.
      */
     public MetaDataCriteria<T> copy() {
-        MetaDataCriteria<T> clone = createClone(mediaFileType, name);
+        MetaDataCriteria<T> clone = createClone(id);
         clone.value = value;
         clone.childCriteria = (childCriteria != null) ? childCriteria.copy() : null;
         return clone;
@@ -115,7 +101,7 @@ public abstract class MetaDataCriteria<T> {
         int level = 0;
         while (currentCriteria != null) {
             StringBuilder criteria = new StringBuilder();
-            criteria.append(currentCriteria.getName()).append(":").append(currentCriteria.getValue());
+            criteria.append(currentCriteria.getId()).append(":").append(currentCriteria.getValue());
             if (level > 0) {
                 criteria.append("; ");
             }
@@ -129,9 +115,8 @@ public abstract class MetaDataCriteria<T> {
     /**
      * Template method to be implemented by subclass. Should instantiate a clone.
      * It is not necessary to copy parent
-     * @param mediaFileType The {@link MediaFileType}.
-     * @param name The name of the criteria.
+     * @param id The ID of the criteria.
      * @return The prepared clone.
      */
-    protected abstract MetaDataCriteria<T> createClone(MediaFileType mediaFileType, String name);
+    protected abstract MetaDataCriteria<T> createClone(String id);
 }

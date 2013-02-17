@@ -4,7 +4,7 @@ import de.gisdesign.nas.media.domain.MediaFileData;
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
-import de.gisdesign.nas.media.domain.SingleValueMetaDataCriteria;
+import de.gisdesign.nas.media.domain.DiscreteValueMetaDataCriteria;
 import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
 import java.io.File;
 import java.util.List;
@@ -119,6 +119,6 @@ public interface MediaRepository<M extends MediaFileData> {
      * @param mediaMetaDataCriteria The leaf of the meta data criteria tree.
      * @return The list of available options of the leaf criteria of the meta data criteria tree.
      */
-    public List<SingleValueMetaDataCriteria> loadMetaDataCriteriaOptions(MetaDataCriteria<?> mediaMetaDataCriteria);
+    public List<DiscreteValueMetaDataCriteria> loadMetaDataCriteriaOptions(MetaDataCriteria<?> mediaMetaDataCriteria);
 
 }

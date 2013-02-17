@@ -1,50 +1,21 @@
 package de.gisdesign.nas.media.repo;
 
-import de.gisdesign.nas.media.domain.MediaFileType;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import org.apache.commons.lang.Validate;
 
 /**
  *
  * @author Denis Pasek
  */
-public abstract class CatalogMetaDataQueryBuilderTemplate implements CatalogMetaDataQueryBuilder {
-
-    /**
-     * The {@link MediaFileType}.
-     */
-    private MediaFileType mediaFileType;
-
-    /**
-     * The name of the query builder.
-     */
-    private String name;
-
-    public CatalogMetaDataQueryBuilderTemplate(MediaFileType mediaFileType, String name) {
-        Validate.notNull(mediaFileType, "MediaFileType is null.");
-        Validate.notEmpty(name, "Name is empty.");
-        this.mediaFileType = mediaFileType;
-        this.name = name;
-    }
+public abstract class DiscreteValueMetaDataQueryBuilderTemplate<T> implements DiscreteValueListSource<T>, MetaDataQueryBuilder<Object> {
 
     @Override
-    public MediaFileType getMediaFileType() {
-        return mediaFileType;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public List<String> convertCriteriaValues(List<?> criteriaObjects) {
+    public List<String> convertCriteriaValues(List<T> criteriaObjects) {
         List<String> criteriaValues = new ArrayList<String>(criteriaObjects.size());
-        for (Object value : criteriaObjects) {
+        for (T value : criteriaObjects) {
             if (value != null)  {
                 criteriaValues.add(convertValueToString(value));
             } else {
@@ -70,7 +41,7 @@ public abstract class CatalogMetaDataQueryBuilderTemplate implements CatalogMeta
      * @param criteriaValue The criteria value.
      * @return The String representation.
      */
-    protected String convertValueToString(Object criteriaValue) {
+    protected String convertValueToString(T criteriaValue) {
         return String.valueOf(criteriaValue);
     }
 
@@ -80,6 +51,6 @@ public abstract class CatalogMetaDataQueryBuilderTemplate implements CatalogMeta
      * @param stringValue The string value. Never <code>null</code>.
      * @return The created object.
      */
-    protected abstract Object convertStringToValue(String stringValue);
+    protected abstract T convertStringToValue(String stringValue);
 
 }

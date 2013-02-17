@@ -2,7 +2,7 @@ package de.gisdesign.nas.media.domain.catalog;
 
 import de.gisdesign.nas.media.domain.MediaFileData;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
-import de.gisdesign.nas.media.domain.SingleValueMetaDataCriteria;
+import de.gisdesign.nas.media.domain.DiscreteValueMetaDataCriteria;
 import de.gisdesign.nas.media.repo.MediaRepository;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
      * @param criteria The {@link MetaDataCriteria}.
      */
     public CriteriaFolderCatalogEntry(MediaRepository<M> mediaRepository, CriteriaFolderCatalogEntry<M> parent, MetaDataCriteria<?> criteria) {
-        LOG.debug("Creating CriteriaFolderCatalogEntry for criteria [{}] with value [{}].", criteria.getName(), criteria.getValue());
+        LOG.debug("Creating CriteriaFolderCatalogEntry for criteria [{}] with value [{}].", criteria.getId(), criteria.getValue());
         this.mediaRepository = mediaRepository;
         this.criteria = criteria;
         this.parent = parent;
@@ -74,12 +74,12 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
         } else {
             initializeChildCriteria();
         }
-        LOG.debug("Created CriteriaFolderCatalogEntry for criteria [{}] with value [{}] successfully.", criteria.getName(), criteria.getValue());
+        LOG.debug("Created CriteriaFolderCatalogEntry for criteria [{}] with value [{}] successfully.", criteria.getId(), criteria.getValue());
     }
 
     @Override
     public String getCategory() {
-        return this.criteria.getMediaFileType().getNamespace() + ":" + this.criteria.getName();
+        return this.criteria.getId();
     }
 
     @Override
@@ -195,9 +195,9 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
      */
     private void initializeChildCriteria() {
         MetaDataCriteria<?> childCriteria = (this.criteria.getValue() != null) ? this.criteria.getChildCriteria() : this.criteria;
-        List<SingleValueMetaDataCriteria> childCriteriaList = mediaRepository.loadMetaDataCriteriaOptions(childCriteria);
-        LOG.debug("Loaded {} child MetaDataCriteria for Criteria [{}] at path [{}].", childCriteriaList.size(), childCriteria.getName(), getPath());
-        for (SingleValueMetaDataCriteria childMetaDataCriteria : childCriteriaList) {
+        List<DiscreteValueMetaDataCriteria> childCriteriaList = mediaRepository.loadMetaDataCriteriaOptions(childCriteria);
+        LOG.debug("Loaded {} child MetaDataCriteria for Criteria [{}] at path [{}].", childCriteriaList.size(), childCriteria.getId(), getPath());
+        for (DiscreteValueMetaDataCriteria childMetaDataCriteria : childCriteriaList) {
             this.childCriteriaMap.put(childMetaDataCriteria.getValueAsString(), childMetaDataCriteria);
         }
     }

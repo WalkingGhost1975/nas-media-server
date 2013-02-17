@@ -3,7 +3,7 @@ package de.gisdesign.nas.media.repo.image;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
 import de.gisdesign.nas.media.domain.image.ImageFileData;
 import de.gisdesign.nas.media.domain.image.ImageMetaData;
-import de.gisdesign.nas.media.repo.CatalogMetaDataQueryBuilder;
+import de.gisdesign.nas.media.repo.DiscreteValueListSource;
 import de.gisdesign.nas.media.repo.MetaDataQueryBuilder;
 import de.gisdesign.nas.media.repo.MetaDataQueryBuilderRegistry;
 import java.io.File;
@@ -89,13 +89,14 @@ class ImageRepositoryDAOImpl implements ImageRepositoryDAO {
     }
 
     @Override
+    @SuppressWarnings({"rawtypes","unchecked"})
     public List<String> loadImageCriteriaValues(MetaDataCriteria<?> criteria) {
-        CatalogMetaDataQueryBuilder queryBuilder = this.queryBuilderRegistry.getQueryBuilder(criteria.getMediaFileType(), criteria.getName(), CatalogMetaDataQueryBuilder.class);
+        DiscreteValueListSource valueListSource = this.queryBuilderRegistry.getDiscreteValueListSource(criteria.getId());
         //Prepare Query
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Object> query = cb.createQuery();
         Root<ImageFileData> root = query.from(ImageFileData.class);
-        query.select(queryBuilder.buildExpression(cb, root));
+        query.select(valueListSource.buildExpression(cb, root));
         //Traverse parent criteria hierarchy
         MetaDataCriteria<?> currentCriteria = criteria.getParent();
         Predicate filter = assembleQueryFilter(currentCriteria, cb, root);
@@ -103,18 +104,19 @@ class ImageRepositoryDAOImpl implements ImageRepositoryDAO {
         if (filter != null)  {
             query.where(filter);
         }
-        query.groupBy(queryBuilder.buildExpression(cb, root));
+        query.groupBy(valueListSource.buildExpression(cb, root));
         //Execute query
         List<Object> criteriaValues = em.createQuery(query).getResultList();
-        return queryBuilder.convertCriteriaValues(criteriaValues);
+        return valueListSource.convertCriteriaValues(criteriaValues);
     }
 
+    @SuppressWarnings({"rawtypes","unchecked"})
     private Predicate assembleQueryFilter(final MetaDataCriteria<?> criteria, CriteriaBuilder cb, Root<ImageFileData> root) {
         //Traverse criteria hierarchy
         MetaDataCriteria<?> currentCriteria = criteria;
         Predicate filter = null;
         while (currentCriteria != null)  {
-            MetaDataQueryBuilder queryCriteria = this.queryBuilderRegistry.getQueryBuilder(currentCriteria.getMediaFileType(), currentCriteria.getName(), MetaDataQueryBuilder.class);
+            MetaDataQueryBuilder queryCriteria = this.queryBuilderRegistry.getQueryBuilder(currentCriteria.getId());
             Predicate filterPredicate = queryCriteria.buildPredicate(cb, root, currentCriteria.getValue());
             filter = (filter == null) ? filterPredicate : cb.and(filter,filterPredicate);
             currentCriteria = currentCriteria.getParent();

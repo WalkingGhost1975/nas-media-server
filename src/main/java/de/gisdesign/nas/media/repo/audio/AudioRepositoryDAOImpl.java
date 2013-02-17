@@ -2,7 +2,7 @@ package de.gisdesign.nas.media.repo.audio;
 
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
 import de.gisdesign.nas.media.domain.audio.AudioFileData;
-import de.gisdesign.nas.media.repo.CatalogMetaDataQueryBuilder;
+import de.gisdesign.nas.media.repo.DiscreteValueListSource;
 import de.gisdesign.nas.media.repo.MetaDataQueryBuilder;
 import de.gisdesign.nas.media.repo.MetaDataQueryBuilderRegistry;
 import java.io.File;
@@ -83,13 +83,14 @@ class AudioRepositoryDAOImpl implements AudioRepositoryDAO {
     }
 
     @Override
+    @SuppressWarnings({"rawtypes","unchecked"})
     public List<String> loadAudioFileCriteriaValues(MetaDataCriteria<?> criteria) {
-        CatalogMetaDataQueryBuilder queryBuilder = this.queryBuilderRegistry.getQueryBuilder(criteria.getMediaFileType(), criteria.getName(), CatalogMetaDataQueryBuilder.class);
+        DiscreteValueListSource valueListSource = this.queryBuilderRegistry.getDiscreteValueListSource(criteria.getId());
         //Prepare Query
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Object> query = cb.createQuery();
         Root<AudioFileData> root = query.from(AudioFileData.class);
-        query.select(queryBuilder.buildExpression(cb, root));
+        query.select(valueListSource.buildExpression(cb, root));
         //Traverse parent criteria hierarchy
         MetaDataCriteria<?> currentCriteria = criteria.getParent();
         Predicate filter = assembleQueryFilter(currentCriteria, cb, root);
@@ -97,18 +98,19 @@ class AudioRepositoryDAOImpl implements AudioRepositoryDAO {
         if (filter != null)  {
             query.where(filter);
         }
-        query.groupBy(queryBuilder.buildExpression(cb, root));
+        query.groupBy(valueListSource.buildExpression(cb, root));
         //Execute query
         List<Object> criteriaValues = em.createQuery(query).getResultList();
-        return queryBuilder.convertCriteriaValues(criteriaValues);
+        return valueListSource.convertCriteriaValues(criteriaValues);
     }
 
+    @SuppressWarnings({"rawtypes","unchecked"})
     private Predicate assembleQueryFilter(final MetaDataCriteria<?> criteria, CriteriaBuilder cb, Root<AudioFileData> root) {
         //Traverse criteria hierarchy
         MetaDataCriteria<?> currentCriteria = criteria;
         Predicate filter = null;
         while (currentCriteria != null)  {
-            MetaDataQueryBuilder queryCriteria = this.queryBuilderRegistry.getQueryBuilder(currentCriteria.getMediaFileType(), currentCriteria.getName(), MetaDataQueryBuilder.class);
+            MetaDataQueryBuilder queryCriteria = this.queryBuilderRegistry.getQueryBuilder(currentCriteria.getId());
             Predicate filterPredicate = queryCriteria.buildPredicate(cb, root, currentCriteria.getValue());
             filter = (filter == null) ? filterPredicate : cb.and(filter,filterPredicate);
             currentCriteria = currentCriteria.getParent();

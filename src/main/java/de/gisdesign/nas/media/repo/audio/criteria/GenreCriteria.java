@@ -1,7 +1,6 @@
 package de.gisdesign.nas.media.repo.audio.criteria;
 
-import de.gisdesign.nas.media.domain.MediaFileType;
-import de.gisdesign.nas.media.repo.CatalogMetaDataQueryBuilderTemplate;
+import de.gisdesign.nas.media.repo.DiscreteValueMetaDataQueryBuilderTemplate;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
@@ -12,11 +11,7 @@ import org.springframework.stereotype.Component;
  * @author Denis Pasek
  */
 @Component("audio:genre")
-public final class GenreCriteria extends CatalogMetaDataQueryBuilderTemplate {
-
-    public GenreCriteria() {
-        super(MediaFileType.AUDIO, "genre");
-    }
+public final class GenreCriteria extends DiscreteValueMetaDataQueryBuilderTemplate<String> {
 
     @Override
     public Expression<String> buildExpression(CriteriaBuilder cb, Root<?> root) {
@@ -24,7 +19,7 @@ public final class GenreCriteria extends CatalogMetaDataQueryBuilderTemplate {
     }
 
     @Override
-    protected Object convertStringToValue(String stringValue) {
+    protected String convertStringToValue(String stringValue) {
         return stringValue;
     }
 }

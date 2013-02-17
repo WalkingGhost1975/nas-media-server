@@ -1,6 +1,6 @@
-package de.gisdesign.nas.media.repo.image.criteria;
+package de.gisdesign.nas.media.repo.audio.criteria;
 
-import de.gisdesign.nas.media.repo.DiscreteValueMetaDataQueryBuilderTemplate;
+import de.gisdesign.nas.media.repo.ValueRangeMetaDataQueryBuilderTemplate;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
@@ -10,16 +10,17 @@ import org.springframework.stereotype.Component;
  *
  * @author Denis Pasek
  */
-@Component("image:creationDateYear")
-public final class YearCriteria extends DiscreteValueMetaDataQueryBuilderTemplate<Integer> {
+@Component("audio:yearRange")
+public class YearRangeCriteria extends ValueRangeMetaDataQueryBuilderTemplate<Integer> {
 
     @Override
     public Expression<Integer> buildExpression(CriteriaBuilder cb, Root<?> root) {
-        return cb.function("year", Integer.class, root.get("metaData").get("creationDate"));
+        return root.get("metaData").get("year");
     }
 
     @Override
     protected Integer convertStringToValue(String stringValue) {
         return Integer.parseInt(stringValue);
     }
+
 }
