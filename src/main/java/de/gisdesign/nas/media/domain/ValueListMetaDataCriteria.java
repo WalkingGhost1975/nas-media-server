@@ -2,13 +2,18 @@ package de.gisdesign.nas.media.domain;
 
 import java.io.IOException;
 import java.util.List;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
  * @author Denis Pasek
  */
-public class ValueListMetaDataCriteria<T> extends MetaDataCriteria<List<T>> {
+public abstract class ValueListMetaDataCriteria<V> extends MetaDataCriteria<V> {
+
+    private List<V> valueList;
 
     private ObjectMapper objectMapper;
 
@@ -17,15 +22,10 @@ public class ValueListMetaDataCriteria<T> extends MetaDataCriteria<List<T>> {
         this.objectMapper = new ObjectMapper();
     }
 
-    @Override
-    public String getValueAsString() {
-        return (getValue() != null) ? String.valueOf(getValue()) : null;
-    }
-
     public String getValueAsJson() {
         String valueString = null;
         try {
-            valueString = objectMapper.writeValueAsString(getValue());
+            valueString = objectMapper.writeValueAsString(valueList);
         } catch (IOException ex) {
             throw new RuntimeException("Cannot serialize value list into String.", ex);
         }
@@ -34,16 +34,19 @@ public class ValueListMetaDataCriteria<T> extends MetaDataCriteria<List<T>> {
 
     public void setValueAsJson(String jsonValue)  {
         try {
-            List<T> valueList = objectMapper.readValue(jsonValue, List.class);
-            setValue(valueList);
+            this.valueList = objectMapper.readValue(jsonValue, List.class);
         } catch (Exception ex) {
             throw new RuntimeException("Cannot deserialize value list [" + jsonValue + "].", ex);
         }
     }
 
     @Override
-    protected ValueListMetaDataCriteria<T> createClone(String id) {
-        return new ValueListMetaDataCriteria<T>(id);
+    public Predicate buildPredicate(CriteriaBuilder cb, Root<?> root) {
+        return buildExpression(cb, root).in(valueList);
     }
 
+    @Override
+    public String convertToString(V value) {
+        return String.valueOf(value);
+    }
 }

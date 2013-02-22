@@ -1,6 +1,5 @@
 package de.gisdesign.nas.media.repo.audio;
 
-import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.audio.AudioFileData;
 import de.gisdesign.nas.media.repo.AbstractMediaFileScanner;
 import de.gisdesign.nas.media.repo.MediaFileScanner;
@@ -18,12 +17,6 @@ public class AudioFileScanner extends AbstractMediaFileScanner<AudioFileData> {
 
     @Autowired
     private AudioMediaRepository mediaRepository;
-
-    @Override
-    public void scanMediaFileLibrary(MediaFileLibrary mediaFileLibrary) {
-        //Execute image scanning
-        super.scanMediaFileLibrary(mediaFileLibrary);
-    }
 
     @Override
     protected MediaRepository<AudioFileData> getMediaRepository() {

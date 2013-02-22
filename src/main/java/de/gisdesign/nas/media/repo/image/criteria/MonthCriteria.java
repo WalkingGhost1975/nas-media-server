@@ -1,18 +1,22 @@
 package de.gisdesign.nas.media.repo.image.criteria;
 
-import de.gisdesign.nas.media.repo.DiscreteValueMetaDataQueryBuilderTemplate;
+import de.gisdesign.nas.media.domain.Criteria;
+import de.gisdesign.nas.media.domain.DiscreteValueMetaDataCriteria;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Denis Pasek
  */
-@Component("image:creationDateMonth")
-public final class MonthCriteria extends DiscreteValueMetaDataQueryBuilderTemplate<Integer> {
+@Criteria("image:creationDateMonth")
+public final class MonthCriteria extends DiscreteValueMetaDataCriteria<Integer> {
+
+    public MonthCriteria() {
+        super("image:creationDateMonth");
+    }
 
     @Override
     public Expression<Integer> buildExpression(CriteriaBuilder cb, Root<?> root) {
@@ -20,12 +24,12 @@ public final class MonthCriteria extends DiscreteValueMetaDataQueryBuilderTempla
     }
 
     @Override
-    protected String convertValueToString(Integer criteriaValue) {
-        return StringUtils.leftPad(String.valueOf(criteriaValue), 2, '0');
+    protected Integer convertStringToValue(String stringValue) {
+        return Integer.parseInt(stringValue);
     }
 
     @Override
-    protected Integer convertStringToValue(String stringValue) {
-        return Integer.parseInt(stringValue);
+    public String convertToString(Integer value) {
+        return (value != null) ? StringUtils.leftPad(String.valueOf(value), 2, '0') : UNKNOWN_VALUE;
     }
 }

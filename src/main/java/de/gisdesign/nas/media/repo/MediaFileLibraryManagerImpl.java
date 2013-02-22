@@ -69,8 +69,7 @@ public class MediaFileLibraryManagerImpl implements MediaFileLibraryManager {
     public MediaFileLibrary getMediaFileLibrary(MediaFileType mediaType, String libraryName) {
         Validate.notNull(mediaType, "MediaFileType is null.");
         Validate.notNull(libraryName, "Library name is null.");
-        MediaFileLibraryEntity mediaFileLibrary = loadMediaFileLibrary(mediaType, libraryName);
-        return mediaFileLibrary;
+        return loadMediaFileLibrary(mediaType, libraryName);
     }
 
     @Transactional

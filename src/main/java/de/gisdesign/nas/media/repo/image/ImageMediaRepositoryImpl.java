@@ -9,7 +9,6 @@ import de.gisdesign.nas.media.admin.ConfigurationService;
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
-import de.gisdesign.nas.media.domain.DiscreteValueMetaDataCriteria;
 import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
 import de.gisdesign.nas.media.domain.image.ColorSpace;
 import de.gisdesign.nas.media.domain.image.FlashMode;
@@ -25,7 +24,6 @@ import de.gisdesign.nas.media.repo.MediaFileScanException;
 import static de.gisdesign.nas.media.repo.image.Configuration.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,8 +125,7 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
             mediaFileData.setSize(imageFile.length());
         }
         //Update sync ID and store metadata.
-        ImageFileData updatedImageFileData = imageRepositoryDAO.saveImage(mediaFileData);
-        return updatedImageFileData;
+        return imageRepositoryDAO.saveImage(mediaFileData);
     }
 
     @Transactional
@@ -164,22 +161,10 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
     }
 
     @Override
-    public List<DiscreteValueMetaDataCriteria> loadMetaDataCriteriaOptions(MetaDataCriteria<?> criteria) {
-        List<String> criteriaValues = imageRepositoryDAO.loadImageCriteriaValues(criteria);
-        LOG.debug("Loaded MetaDataCriteriaValues {} for MetaDataCriteria [{}]", criteriaValues, criteria.dumpHierarchy());
-        List<DiscreteValueMetaDataCriteria> criteriaChildren = new ArrayList<DiscreteValueMetaDataCriteria>(criteriaValues.size());
-        for (String value : criteriaValues) {
-            DiscreteValueMetaDataCriteria newMetaDataCriteria = new DiscreteValueMetaDataCriteria(criteria.getId());
-            newMetaDataCriteria.setValue(value);
-            if (criteria.getParent() != null)  {
-                newMetaDataCriteria.setParent(criteria.getParent());
-            }
-            if (criteria.getChildCriteria() != null)  {
-                newMetaDataCriteria.setChildCriteria(criteria.getChildCriteria().copy());
-            }
-            criteriaChildren.add(newMetaDataCriteria);
-        }
-        return criteriaChildren;
+    public <T> List<T> loadMetaDataCriteriaOptions(MetaDataCriteria<T> metaDataCriteria) {
+        List<T> criteriaValues = imageRepositoryDAO.loadImageCriteriaValues(metaDataCriteria);
+        LOG.debug("Loaded MetaDataCriteriaValues {} for MetaDataCriteria [{}]", criteriaValues, metaDataCriteria.dumpHierarchy());
+        return criteriaValues;
     }
 
     @Override
@@ -321,7 +306,7 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
         Integer slideShowHeight = null;
         String slideShowHeightValue = configService.getConfigurationParameter(MediaFileType.IMAGE, CONFIG_PARAM_SLIDE_SHOW_SIZE);
         try {
-            slideShowHeight = (slideShowHeightValue != null) ? new Integer(slideShowHeightValue) : null;
+            slideShowHeight = (slideShowHeightValue != null) ? Integer.valueOf(slideShowHeightValue) : null;
         } catch (NumberFormatException ex) {
             LOG.error("Invalid value [{}] for slide show image height configured.", slideShowHeightValue);
         }

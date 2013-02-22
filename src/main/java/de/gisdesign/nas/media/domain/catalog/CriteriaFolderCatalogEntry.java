@@ -2,13 +2,14 @@ package de.gisdesign.nas.media.domain.catalog;
 
 import de.gisdesign.nas.media.domain.MediaFileData;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
-import de.gisdesign.nas.media.domain.DiscreteValueMetaDataCriteria;
+import de.gisdesign.nas.media.domain.MetaDataCriteriaFactory;
 import de.gisdesign.nas.media.repo.MediaRepository;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +19,10 @@ import org.slf4j.LoggerFactory;
  * and the {@link CriteriaFolderCatalogEntry} build up the catalog structures containing
  * the media files organzed based on the {@link MetaDataCriteria}.
  * @param <M> The supported type of {@link MediaFileData}.
+ * @param <V> The value type manged by the underlying {@link MetaDataCriteria}.
  * @author Denis Pasek
  */
-public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements CatalogEntry {
+public final class CriteriaFolderCatalogEntry<M extends MediaFileData,V> implements CatalogEntry {
 
     /**
      * Logger.
@@ -35,7 +37,7 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
     /**
      * The parent {@link CriteriaFolderCatalogEntry}.
      */
-    private CriteriaFolderCatalogEntry<M> parent;
+    private CriteriaFolderCatalogEntry<M,?> parent;
 
     /**
      * The loaded {@link MediaFileData} meta information of all media file in the directory.
@@ -43,14 +45,24 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
     private Map<String,M> mediaFileDataMap = new HashMap<String,M>();
 
     /**
-     * The {@link MetaDataCriteria} of this folder.
+     * The loaded {@link MediaFileData} meta information of all media file in the directory.
      */
-    private MetaDataCriteria<?> criteria;
+    private Map<String,CriteriaFolderCatalogEntry<M,?>> childFolderMap = new HashMap<String,CriteriaFolderCatalogEntry<M,?>>();
 
     /**
-     * The child criteria. Only used if not being leaf folder.
+     * The ID of the {@link MetaDataCriteria} represented by this {@link CriteriaFolderCatalogEntry}.
      */
-    private Map<String,MetaDataCriteria<?>> childCriteriaMap = new HashMap<String, MetaDataCriteria<?>>();
+    private String metaDataCriteriaId;
+
+    /**
+     * The {@link CriteriaFolderHierachy}.
+     */
+    private CriteriaFolderHierachy childCriteriaFolderHierarchy;
+
+    /**
+     * The value string for the {@link MetaDataCriteria}.
+     */
+    private String value;
 
     /**
      * The path in the navigation structure.
@@ -58,33 +70,68 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
     private String path;
 
     /**
+     * The {@link MetaDataCriteriaFactory}.
+     */
+    private MetaDataCriteriaFactory criteriaFactory;
+
+    /**
+     * Constructor.
+     * @param mediaRepository The {@link MediaRepositoryService}. May not be <code>null</code>.
+     * @param criteriaHierachy The {@link CriteriaFolderHierachy}.
+     */
+    public CriteriaFolderCatalogEntry(MediaRepository<M> mediaRepository, CriteriaFolderHierachy criteriaHierachy) {
+        this(mediaRepository, null, criteriaHierachy);
+    }
+
+    /**
      * Constructor.
      * @param mediaRepository The {@link MediaRepositoryService}. May not be <code>null</code>.
      * @param parent The parent {@link CriteriaFolderCatalogEntry}. Maybe <code>null</code>.
-     * @param criteria The {@link MetaDataCriteria}.
+     * @param criteriaHierachy The {@link CriteriaFolderHierachy}.
      */
-    public CriteriaFolderCatalogEntry(MediaRepository<M> mediaRepository, CriteriaFolderCatalogEntry<M> parent, MetaDataCriteria<?> criteria) {
-        LOG.debug("Creating CriteriaFolderCatalogEntry for criteria [{}] with value [{}].", criteria.getId(), criteria.getValue());
+    public CriteriaFolderCatalogEntry(MediaRepository<M> mediaRepository, CriteriaFolderCatalogEntry<M,?> parent, CriteriaFolderHierachy criteriaHierachy) {
+        this(mediaRepository, parent, criteriaHierachy, null);
+    }
+
+    /**
+     * Constructor.
+     * @param mediaRepository The {@link MediaRepositoryService}. May not be <code>null</code>.
+     * @param parent The parent {@link CriteriaFolderCatalogEntry}. Maybe <code>null</code>.
+     * @param criteriaHierachy The {@link CriteriaFolderHierachy}.
+     * @param valueString The value string for the {@link MetaDataCriteria}.
+     */
+    public CriteriaFolderCatalogEntry(MediaRepository<M> mediaRepository, CriteriaFolderCatalogEntry<M,?> parent, CriteriaFolderHierachy criteriaHierachy, String valueString) {
+        Validate.notNull(mediaRepository, "MediaRepository is null");
+        Validate.notNull(criteriaHierachy, "CriteriaFolderHierachy is null");
         this.mediaRepository = mediaRepository;
-        this.criteria = criteria;
+        this.criteriaFactory = criteriaHierachy.getCriteriaFactory();
         this.parent = parent;
-        buildPath(parent);
-        if (criteria.isLeaf())  {
+        this.metaDataCriteriaId = criteriaHierachy.getCriteria();
+        this.childCriteriaFolderHierarchy = (valueString == null) ? criteriaHierachy : criteriaHierachy.getSubCriteria();
+        this.value = valueString;
+
+        LOG.debug("Creating CriteriaFolderCatalogEntry for criteria [{}] with value [{}].", this.metaDataCriteriaId, valueString);
+        this.path = buildPath();
+        if (isLeaf()) {
             initializeMediaFileDataMap();
         } else {
             initializeChildCriteria();
         }
-        LOG.debug("Created CriteriaFolderCatalogEntry for criteria [{}] with value [{}] successfully.", criteria.getId(), criteria.getValue());
+        LOG.debug("Created CriteriaFolderCatalogEntry for criteria [{}] with value [{}] successfully.", this.metaDataCriteriaId, valueString);
     }
 
     @Override
     public String getCategory() {
-        return this.criteria.getId();
+        return this.metaDataCriteriaId;
     }
 
     @Override
     public String getName() {
-        return this.criteria.getValueAsString();
+        return this.value;
+    }
+
+    public String getValue()  {
+        return this.value;
     }
 
     @Override
@@ -94,7 +141,7 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
     }
 
     @Override
-    public CatalogEntry getParent() {
+    public CriteriaFolderCatalogEntry<M,?> getParent() {
         return parent;
     }
 
@@ -106,10 +153,10 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
     @Override
     public int size() {
         int size;
-        if (criteria.isLeaf())  {
+        if (isLeaf())  {
             size = this.mediaFileDataMap.size();
         } else {
-            size = this.childCriteriaMap.size();
+            size = this.childFolderMap.size();
         }
         return size;
     }
@@ -118,7 +165,7 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
     public List<CatalogEntry> getChildren() {
         LOG.debug("Assembling child CriteriaFolderCatalogEntry for criteria folder [{}].", getPath());
         List<CatalogEntry> children = new ArrayList<CatalogEntry>(size());
-        if (criteria.isLeaf())  {
+        if (isLeaf())  {
             for (M mediaFileData : this.mediaFileDataMap.values()) {
                 CatalogEntry catalogEntry = mediaRepository.createMediaFileCatalogEntry(this, mediaFileData);
                 if (catalogEntry != null)  {
@@ -126,10 +173,7 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
                 }
             }
         } else {
-            for (MetaDataCriteria<?> childCriteria : this.childCriteriaMap.values()) {
-                CatalogEntry catalogEntry = new CriteriaFolderCatalogEntry<M>(mediaRepository, this, childCriteria);
-                children.add(catalogEntry);
-            }
+            return new ArrayList<CatalogEntry>(childFolderMap.values());
         }
         LOG.debug("Assembled children CriteriaFolderCatalogEntry for criteria folder [{}] successfully.", getPath());
         return children;
@@ -138,10 +182,10 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
     @Override
     public boolean hasChild(String name) {
         boolean hasChild;
-        if (criteria.isLeaf())  {
+        if (isLeaf())  {
             hasChild = this.mediaFileDataMap.containsKey(name);
         } else {
-            hasChild = this.childCriteriaMap.containsKey(name);
+            hasChild = this.childFolderMap.containsKey(name);
         }
         return hasChild;
     }
@@ -151,13 +195,12 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
         CatalogEntry catalogEntry = null;
         if (hasChild(name))  {
             LOG.debug("Retrieving child [{}] CriteriaFolderCatalogEntry for criteria folder [{}].", name, getPath());
-            if (this.criteria.isLeaf())  {
+            if (isLeaf())  {
                 LOG.debug("Using existing MediaFileData for ImageFile [{}] for criteria folder [{}].", name, getPath());
                 M metaData = getMediaFileData(name);
                 catalogEntry = mediaRepository.createMediaFileCatalogEntry(this, metaData);
             } else {
-                MetaDataCriteria<?> childCriteria = this.childCriteriaMap.get(name);
-                catalogEntry = new CriteriaFolderCatalogEntry<M>(mediaRepository, this, childCriteria);
+                catalogEntry = this.childFolderMap.get(name);
             }
         }
         return catalogEntry;
@@ -166,6 +209,14 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
     @Override
     public boolean isAuthorized(Principal principal) {
         return true;
+    }
+
+    /**
+     * Checks whether this {@link CriteriaFolderCatalogEntry} is the leaf of the hierachy.
+     * @return <code>true</code> in case of leaf of hierarchy.
+     */
+    public boolean isLeaf()  {
+        return (this.value != null && !this.childCriteriaFolderHierarchy.hasSubCriteria());
     }
 
     /**
@@ -182,6 +233,7 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
      * in the underlying media file directory.
      */
     private void initializeMediaFileDataMap() {
+        MetaDataCriteria<?> criteria = buildMetaDataCriteriaHierarchy();
         List<M> mediaFileDataList = mediaRepository.findMediaFilesByCriteria(criteria);
         LOG.debug("Loaded {} MediaFileData for media files in criteria folder [{}].", mediaFileDataList.size(), getPath());
         for (M mediaFileData : mediaFileDataList) {
@@ -194,11 +246,52 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
      * of this entry.
      */
     private void initializeChildCriteria() {
-        MetaDataCriteria<?> childCriteria = (this.criteria.getValue() != null) ? this.criteria.getChildCriteria() : this.criteria;
-        List<DiscreteValueMetaDataCriteria> childCriteriaList = mediaRepository.loadMetaDataCriteriaOptions(childCriteria);
-        LOG.debug("Loaded {} child MetaDataCriteria for Criteria [{}] at path [{}].", childCriteriaList.size(), childCriteria.getId(), getPath());
-        for (DiscreteValueMetaDataCriteria childMetaDataCriteria : childCriteriaList) {
-            this.childCriteriaMap.put(childMetaDataCriteria.getValueAsString(), childMetaDataCriteria);
+        MetaDataCriteria<Object> criteria = buildMetaDataCriteriaHierarchy();
+        List<Object> criteriaValues = mediaRepository.loadMetaDataCriteriaOptions(criteria);
+        LOG.debug("Loaded {} child MetaDataCriteria for Criteria [{}] at path [{}].", criteriaValues.size(), criteria.getId(), getPath());
+        for (Object criteriaValue : criteriaValues) {
+            String valueString = criteria.convertToString(criteriaValue);
+            CriteriaFolderCatalogEntry<M,V> parentEntry = (value != null ? this : null);
+            CriteriaFolderCatalogEntry<M,?> childEntry = new CriteriaFolderCatalogEntry<M,V>(mediaRepository, parentEntry, childCriteriaFolderHierarchy, valueString);
+            this.childFolderMap.put(valueString, childEntry);
+        }
+    }
+
+    /**
+     * Builds the {@link MetaDataCriteria} hierarchy used to select the child {@link CriteriaFolderCatalogEntry}s
+     * or the {@link MediaFileData} from the {@link MediaRepository}.
+     * @return The {@link MetaDataCriteria} hierarchy.
+     */
+    private MetaDataCriteria<Object> buildMetaDataCriteriaHierarchy()  {
+        //Build root criteria element, depending if we are a leaf or not.
+        MetaDataCriteria<Object> criteria;
+        if (isLeaf()) {
+            criteria = criteriaFactory.createMetaDataCriteria(metaDataCriteriaId);
+            criteria.setValueAsString(value);
+            addParentMetaDataCriteria(criteria, getParent());
+        } else {
+            criteria = criteriaFactory.createMetaDataCriteria(childCriteriaFolderHierarchy.getCriteria());
+            addParentMetaDataCriteria(criteria, this);
+        }
+        return criteria;
+    }
+
+    /**
+     * Adds the parent {@link MetaDataCriteria} to the given {@link MetaDataCriteria} by traversing the
+     * parent hierarchy of the root {@link CriteriaFolderCatalogEntry}.
+     * @param criteria The base {@link MetaDataCriteria} to add the parents to.
+     * @param rootEntry The root {@link CriteriaFolderCatalogEntry}.
+     */
+    private void addParentMetaDataCriteria(MetaDataCriteria<?> criteria, CriteriaFolderCatalogEntry<M, ?> rootEntry) {
+        //Add the parent elements.
+        CriteriaFolderCatalogEntry<M, ?> currentEntry = rootEntry;
+        MetaDataCriteria<?> currentCriteria = criteria;
+        while (currentEntry != null && currentEntry.getValue() != null) {
+            MetaDataCriteria<?> parentCriteria = criteriaFactory.createMetaDataCriteria(currentEntry.getCategory());
+            parentCriteria.setValueAsString(currentEntry.getValue());
+            currentCriteria.setParent(parentCriteria);
+            currentEntry = currentEntry.getParent();
+            currentCriteria = parentCriteria;
         }
     }
 
@@ -206,13 +299,18 @@ public class CriteriaFolderCatalogEntry<M extends MediaFileData> implements Cata
      * Method to build the path of the {@link CriteriaFolderCatalogEntry}.
      * @param parent The parent {@link CriteriaFolderCatalogEntry}.
      */
-    private void buildPath(CriteriaFolderCatalogEntry<M> parent) {
-        String pathValue = (criteria.getValue() != null) ? criteria.getValueAsString() : "/";
+    private String buildPath() {
+        StringBuilder pathBuilder = new StringBuilder();
         if (parent != null)  {
-            String parentPath = "/".equals(parent.getPath()) ? "" : parent.getPath();
-            pathValue = parentPath + "/" + pathValue;
+            String parentPath = parent.buildPath();
+            pathBuilder.append("/".equals(parentPath) ? "" : parentPath);
         }
-        this.path = pathValue;
+        pathBuilder.append('/');
+        if (value != null) {
+            pathBuilder.append(value);
+        }
+        return pathBuilder.toString();
     }
+
 
 }

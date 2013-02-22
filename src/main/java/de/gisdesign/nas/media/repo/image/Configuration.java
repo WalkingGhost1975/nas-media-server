@@ -7,7 +7,7 @@ import java.util.Map;
  * Internal configuration model for the {@link ImageMediaRepository}.
  * @author Denis Pasek
  */
-class Configuration {
+final class Configuration {
 
     /**
      * The name of the configuration parameter for the directory holding the resclaed images.

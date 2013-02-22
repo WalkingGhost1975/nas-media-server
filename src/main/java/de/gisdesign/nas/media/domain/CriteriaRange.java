@@ -2,9 +2,10 @@ package de.gisdesign.nas.media.domain;
 
 /**
  *
+ * @param <T> The type of the range values.
  * @author Denis Pasek
  */
-public class CriteriaRange<T> {
+public class CriteriaRange<T extends Comparable<T>> {
 
     private T minValue;
 

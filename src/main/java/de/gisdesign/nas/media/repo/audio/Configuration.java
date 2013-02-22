@@ -1,6 +1,5 @@
 package de.gisdesign.nas.media.repo.audio;
 
-import de.gisdesign.nas.media.repo.image.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,7 +7,7 @@ import java.util.Map;
  * Internal configuration model for the {@link ImageMediaRepository}.
  * @author Denis Pasek
  */
-class Configuration {
+final class Configuration {
 
     /**
      * The configuration parameter use to configure the audio scanning.

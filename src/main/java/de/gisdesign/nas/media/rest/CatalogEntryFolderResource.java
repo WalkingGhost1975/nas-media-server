@@ -1,6 +1,7 @@
 package de.gisdesign.nas.media.rest;
 
 import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -137,7 +138,12 @@ public class CatalogEntryFolderResource {
      * are always sorted on to the beginning in alphabetical orders followed by the
      * media entries in alphabetical order.
      */
-    private static final class NodeComparator implements Comparator<NodeDTO> {
+    private static final class NodeComparator implements Comparator<NodeDTO>, Serializable {
+        /**
+         * Serialization ID.
+         */
+        private static final long serialVersionUID = 1L;
+
         @Override
         public int compare(NodeDTO o1, NodeDTO o2) {
             int result;

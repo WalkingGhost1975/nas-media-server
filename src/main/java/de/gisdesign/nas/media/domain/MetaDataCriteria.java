@@ -1,23 +1,28 @@
 package de.gisdesign.nas.media.domain;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import org.apache.commons.lang.Validate;
 
 /**
  * Represents a node in a hierarchy of criteria used to match certain media files.
- * @param <T> The type of value supported.
+ * @param <V> The type of value supported.
  * @author Denis Pasek
  */
-public abstract class MetaDataCriteria<T> {
+public abstract class MetaDataCriteria<V> {
+
+    /**
+     * String expression of unknown criteria value to be used. Usually maps to
+     * a query for null value.
+     */
+    public static final String UNKNOWN_VALUE = "%unknown%";
 
     /**
      * The ID of the criteria.
      */
     private String id;
-
-    /**
-     * The value of the criteria.
-     */
-    private T value;
 
     /**
      * The parent criteria.
@@ -42,16 +47,6 @@ public abstract class MetaDataCriteria<T> {
         return id;
     }
 
-    public T getValue() {
-        return value;
-    }
-
-    public void setValue(T value)  {
-        this.value = value;
-    }
-
-    public abstract String getValueAsString();
-
     public MetaDataCriteria<?> getParent() {
         return parent;
     }
@@ -69,26 +64,28 @@ public abstract class MetaDataCriteria<T> {
         this.childCriteria.setParent(this);
     }
 
-    /**
-     * Checks whether this criteria is a leaf criteria. Leaf criteria can be used
-     * to match a set of media files while non-leaf criteria can used to match
-     * a list of possible criteria options.
-     * @return <code>true</code> if this criteria is leaf criteria.
-     */
-    public boolean isLeaf() {
-        return (value != null && childCriteria == null);
-    }
+    public abstract String getValueAsString();
+
+    public abstract void setValueAsString(String stringValue);
+
+    public abstract String convertToString(V value);
 
     /**
-     * Performs a deep copy of this criteria and all the referenced child criteria.
-     * @return The deep copy of this {@link MetaDataCriteria}.
+     * Builds an {@link Expression} for the criteria. This expression refers to the entity
+     * property which is matched against the criteria.
+     * @param cb The {@link CriteriaBuilder}.
+     * @param root The entity root {@link Expression}.
+     * @return The {@link Expression} pointing to the entity property of the criteria.
      */
-    public MetaDataCriteria<T> copy() {
-        MetaDataCriteria<T> clone = createClone(id);
-        clone.value = value;
-        clone.childCriteria = (childCriteria != null) ? childCriteria.copy() : null;
-        return clone;
-    }
+    public abstract Expression<V> buildExpression(CriteriaBuilder cb, Root<?> root);
+
+    /**
+     * Builds a search {@link Predicate} used to match the criteria value.
+     * @param cb The {@link CriteriaBuilder}.
+     * @param root The entity root {@link Expression}.
+     * @return The search {@link Predicate}.
+     */
+    public abstract Predicate buildPredicate(CriteriaBuilder cb, Root<?> root);
 
     /**
      * Dumps the hoerachy of the {@link MetaDataCriteria} into a human readble form.
@@ -101,9 +98,9 @@ public abstract class MetaDataCriteria<T> {
         int level = 0;
         while (currentCriteria != null) {
             StringBuilder criteria = new StringBuilder();
-            criteria.append(currentCriteria.getId()).append(":").append(currentCriteria.getValue());
+            criteria.append(currentCriteria.getId());
             if (level > 0) {
-                criteria.append("; ");
+                criteria.append("/");
             }
             sb.insert(0, criteria);
             currentCriteria = currentCriteria.getParent();
@@ -111,12 +108,4 @@ public abstract class MetaDataCriteria<T> {
         }
         return sb.toString();
     }
-
-    /**
-     * Template method to be implemented by subclass. Should instantiate a clone.
-     * It is not necessary to copy parent
-     * @param id The ID of the criteria.
-     * @return The prepared clone.
-     */
-    protected abstract MetaDataCriteria<T> createClone(String id);
 }

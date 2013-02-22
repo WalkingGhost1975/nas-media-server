@@ -1,7 +1,8 @@
 package de.gisdesign.nas.media.rest.image;
 
-import de.gisdesign.nas.media.domain.DiscreteValueMetaDataCriteria;
+import de.gisdesign.nas.media.domain.MetaDataCriteriaFactory;
 import de.gisdesign.nas.media.domain.catalog.CriteriaFolderCatalogEntry;
+import de.gisdesign.nas.media.domain.catalog.CriteriaFolderHierachy;
 import de.gisdesign.nas.media.domain.image.ImageFileData;
 import de.gisdesign.nas.media.repo.image.ImageFileScanner;
 import de.gisdesign.nas.media.repo.image.ImageMediaRepository;
@@ -54,6 +55,12 @@ public class ImageRepositoryResource {
     private ImageFileScanner imageFileScanner;
 
     /**
+     * The {@link MetaDataCriteriaFactory}.
+     */
+    @Autowired
+    private MetaDataCriteriaFactory criteriaFactory;
+
+    /**
      * The {@link CatalogEntryResourceBuilder}.
      */
     private ImageResourceBuilder resourceBuilder;
@@ -101,17 +108,18 @@ public class ImageRepositoryResource {
 
     @Path("/byYearAndMonth")
     public CatalogEntryFolderResource getByYearAndMonth() {
-        DiscreteValueMetaDataCriteria yearCriteria = new DiscreteValueMetaDataCriteria("image:creationDateYear");
-        DiscreteValueMetaDataCriteria monthCriteria = new DiscreteValueMetaDataCriteria("image:creationDateMonth");
-        yearCriteria.setChildCriteria(monthCriteria);
-        CriteriaFolderCatalogEntry<ImageFileData> catalogEntry = new CriteriaFolderCatalogEntry<ImageFileData>(imageRepository, null, yearCriteria);
+        CriteriaFolderHierachy hierarchy = new CriteriaFolderHierachy(criteriaFactory);
+        hierarchy.addCriteria("image:creationDateYear");
+        hierarchy.addCriteria("image:creationDateMonth");
+        CriteriaFolderCatalogEntry<ImageFileData,Integer> catalogEntry = new CriteriaFolderCatalogEntry<ImageFileData,Integer>(imageRepository, hierarchy);
         return new CatalogEntryFolderResource(resourceBuilder, catalogEntry, uriInfo);
     }
 
     @Path("/byTag")
     public CatalogEntryFolderResource getByTag() {
-        DiscreteValueMetaDataCriteria tagLevel1Criteria = new DiscreteValueMetaDataCriteria("image:tags");
-        CriteriaFolderCatalogEntry<ImageFileData> catalogEntry = new CriteriaFolderCatalogEntry<ImageFileData>(imageRepository, null, tagLevel1Criteria);
+        CriteriaFolderHierachy hierarchy = new CriteriaFolderHierachy(criteriaFactory);
+        hierarchy.addCriteria("image:tags");
+        CriteriaFolderCatalogEntry<ImageFileData,Integer> catalogEntry = new CriteriaFolderCatalogEntry<ImageFileData,Integer>(imageRepository, hierarchy);
         return new CatalogEntryFolderResource(resourceBuilder, catalogEntry, uriInfo);
     }
 

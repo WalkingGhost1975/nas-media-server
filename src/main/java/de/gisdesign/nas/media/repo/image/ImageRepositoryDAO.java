@@ -23,7 +23,7 @@ interface ImageRepositoryDAO {
 
     public List<ImageFileData> findImagesForRescaling(int index, int batchSize);
 
-    public List<String> loadImageCriteriaValues(MetaDataCriteria<?> criteria);
+    public <T> List<T> loadImageCriteriaValues(MetaDataCriteria<T> criteria);
 
     public ImageFileData saveImage(ImageFileData imageFileData);
 

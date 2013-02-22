@@ -1,11 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.gisdesign.nas.media.domain.catalog;
 
-import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
-import de.gisdesign.nas.media.domain.catalog.MediaFileCatalogEntry;
 import java.io.File;
 import java.security.Principal;
 import java.util.List;

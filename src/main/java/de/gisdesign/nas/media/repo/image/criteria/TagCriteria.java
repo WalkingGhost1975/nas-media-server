@@ -1,6 +1,7 @@
 package de.gisdesign.nas.media.repo.image.criteria;
 
-import de.gisdesign.nas.media.repo.DiscreteValueMetaDataQueryBuilderTemplate;
+import de.gisdesign.nas.media.domain.Criteria;
+import de.gisdesign.nas.media.domain.DiscreteValueMetaDataCriteria;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
@@ -10,8 +11,12 @@ import org.springframework.stereotype.Component;
  *
  * @author Denis Pasek
  */
-@Component("image:tags")
-public final class TagCriteria extends DiscreteValueMetaDataQueryBuilderTemplate<String> {
+@Criteria("image:tags")
+public final class TagCriteria extends DiscreteValueMetaDataCriteria<String> {
+
+    public TagCriteria() {
+        super("image:tags");
+    }
 
     @Override
     public Expression<String> buildExpression(CriteriaBuilder cb, Root<?> root) {
@@ -22,5 +27,4 @@ public final class TagCriteria extends DiscreteValueMetaDataQueryBuilderTemplate
     protected String convertStringToValue(String stringValue) {
         return stringValue;
     }
-
 }

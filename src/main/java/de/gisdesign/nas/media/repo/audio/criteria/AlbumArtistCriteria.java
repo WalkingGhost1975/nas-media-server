@@ -1,17 +1,21 @@
 package de.gisdesign.nas.media.repo.audio.criteria;
 
-import de.gisdesign.nas.media.repo.DiscreteValueMetaDataQueryBuilderTemplate;
+import de.gisdesign.nas.media.domain.Criteria;
+import de.gisdesign.nas.media.domain.DiscreteValueMetaDataCriteria;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
-import org.springframework.stereotype.Component;
 
 /**
  * A single value criteria used to filter for the genre of the audio file.
  * @author Denis Pasek
  */
-@Component("audio:albumArtist")
-public final class AlbumArtistCriteria extends DiscreteValueMetaDataQueryBuilderTemplate<String> {
+@Criteria("audio:albumArtist")
+public final class AlbumArtistCriteria extends DiscreteValueMetaDataCriteria<String>  {
+
+    public AlbumArtistCriteria() {
+        super("audio:albumArtist");
+    }
 
     @Override
     public Expression<String> buildExpression(CriteriaBuilder cb, Root<?> root) {

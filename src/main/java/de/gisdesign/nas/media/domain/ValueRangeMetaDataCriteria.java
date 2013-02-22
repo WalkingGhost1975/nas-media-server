@@ -1,35 +1,56 @@
 package de.gisdesign.nas.media.domain;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
 /**
  *
+ * @param <V> The type of the value range.
  * @author Denis Pasek
  */
-public class ValueRangeMetaDataCriteria<T> extends MetaDataCriteria<CriteriaRange<T>> {
+public abstract class ValueRangeMetaDataCriteria<V extends Comparable<V>> extends MetaDataCriteria<V> {
+
+    private CriteriaRange<V> range;
+
+    public CriteriaRange<V> getRange() {
+        return range;
+    }
+
+    public void setRange(CriteriaRange<V> range) {
+        this.range = range;
+    }
 
     public ValueRangeMetaDataCriteria(String id) {
         super(id);
     }
 
     @Override
-    public String getValueAsString() {
-        CriteriaRange<T> range = getValue();
-        return range != null ? buildRangeString(range) : null;
+    public Predicate buildPredicate(CriteriaBuilder cb, Root<?> root) {
+        Predicate predicate = null;
+        Expression<V> expression = buildExpression(cb, root);
+        if (range.getMinValue() != null)  {
+            predicate = cb.greaterThanOrEqualTo(expression, range.getMinValue());
+        }
+        if (range.getMaxValue() != null)  {
+            Predicate maxValue = cb.lessThanOrEqualTo(expression, range.getMaxValue());
+            predicate = (predicate != null) ? cb.and(predicate, maxValue) : maxValue;
+        }
+        return predicate;
     }
 
     @Override
-    protected MetaDataCriteria<CriteriaRange<T>> createClone(String id) {
-        return new ValueRangeMetaDataCriteria<T>(getId());
+    public abstract Expression<V> buildExpression(CriteriaBuilder cb, Root<?> root);
+
+    @Override
+    public String getValueAsString() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private String buildRangeString(CriteriaRange<T> range) {
-        StringBuilder sb = new StringBuilder();
-        if (range.getMinValue() != null)  {
-            sb.append(range.getMinValue());
-        }
-        sb.append("-");
-        if (range.getMaxValue() != null)  {
-            sb.append(range.getMaxValue());
-        }
-        return sb.toString();
+    @Override
+    public void setValueAsString(String stringValue) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
+
 }

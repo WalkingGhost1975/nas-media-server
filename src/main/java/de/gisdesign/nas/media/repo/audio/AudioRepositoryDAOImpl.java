@@ -2,9 +2,6 @@ package de.gisdesign.nas.media.repo.audio;
 
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
 import de.gisdesign.nas.media.domain.audio.AudioFileData;
-import de.gisdesign.nas.media.repo.DiscreteValueListSource;
-import de.gisdesign.nas.media.repo.MetaDataQueryBuilder;
-import de.gisdesign.nas.media.repo.MetaDataQueryBuilderRegistry;
 import java.io.File;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -14,7 +11,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,9 +23,6 @@ class AudioRepositoryDAOImpl implements AudioRepositoryDAO {
 
     @PersistenceContext
     private EntityManager em;
-
-    @Autowired
-    private MetaDataQueryBuilderRegistry queryBuilderRegistry;
 
     @Override
     public List<AudioFileData> findAudioFilesByDirectory(String directoryName) {
@@ -83,14 +76,12 @@ class AudioRepositoryDAOImpl implements AudioRepositoryDAO {
     }
 
     @Override
-    @SuppressWarnings({"rawtypes","unchecked"})
-    public List<String> loadAudioFileCriteriaValues(MetaDataCriteria<?> criteria) {
-        DiscreteValueListSource valueListSource = this.queryBuilderRegistry.getDiscreteValueListSource(criteria.getId());
+    public <T> List<T> loadAudioFileCriteriaValues(MetaDataCriteria<T> criteria) {
         //Prepare Query
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Object> query = cb.createQuery();
+        CriteriaQuery<T> query = (CriteriaQuery<T>) cb.createQuery();
         Root<AudioFileData> root = query.from(AudioFileData.class);
-        query.select(valueListSource.buildExpression(cb, root));
+        query.select(criteria.buildExpression(cb, root));
         //Traverse parent criteria hierarchy
         MetaDataCriteria<?> currentCriteria = criteria.getParent();
         Predicate filter = assembleQueryFilter(currentCriteria, cb, root);
@@ -98,20 +89,17 @@ class AudioRepositoryDAOImpl implements AudioRepositoryDAO {
         if (filter != null)  {
             query.where(filter);
         }
-        query.groupBy(valueListSource.buildExpression(cb, root));
+        query.groupBy(criteria.buildExpression(cb, root));
         //Execute query
-        List<Object> criteriaValues = em.createQuery(query).getResultList();
-        return valueListSource.convertCriteriaValues(criteriaValues);
+        return em.createQuery(query).getResultList();
     }
 
-    @SuppressWarnings({"rawtypes","unchecked"})
     private Predicate assembleQueryFilter(final MetaDataCriteria<?> criteria, CriteriaBuilder cb, Root<AudioFileData> root) {
         //Traverse criteria hierarchy
         MetaDataCriteria<?> currentCriteria = criteria;
         Predicate filter = null;
         while (currentCriteria != null)  {
-            MetaDataQueryBuilder queryCriteria = this.queryBuilderRegistry.getQueryBuilder(currentCriteria.getId());
-            Predicate filterPredicate = queryCriteria.buildPredicate(cb, root, currentCriteria.getValue());
+            Predicate filterPredicate = currentCriteria.buildPredicate(cb, root);
             filter = (filter == null) ? filterPredicate : cb.and(filter,filterPredicate);
             currentCriteria = currentCriteria.getParent();
         }

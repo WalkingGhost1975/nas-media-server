@@ -1,11 +1,9 @@
 package de.gisdesign.nas.media.repo.audio;
 
 import com.beaglebuddy.mp3.MP3;
-import de.gisdesign.nas.media.admin.ConfigurationService;
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
-import de.gisdesign.nas.media.domain.DiscreteValueMetaDataCriteria;
 import de.gisdesign.nas.media.domain.audio.AudioCatalogEntry;
 import de.gisdesign.nas.media.domain.audio.AudioFileData;
 import de.gisdesign.nas.media.domain.audio.AudioMetaData;
@@ -15,7 +13,6 @@ import de.gisdesign.nas.media.repo.MediaFileLibraryManager;
 import de.gisdesign.nas.media.repo.MediaFileScanException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,9 +34,6 @@ public class AudioMediaRepositoryImpl implements AudioMediaRepository {
      * Logger.
      */
     private static final Logger LOG = LoggerFactory.getLogger(AudioMediaRepositoryImpl.class);
-
-    @Autowired
-    private ConfigurationService configService;
 
     @Autowired
     private MediaFileLibraryManager mediaFileLibraryManager;
@@ -113,8 +107,7 @@ public class AudioMediaRepositoryImpl implements AudioMediaRepository {
             mediaFileData.setSize(audioFile.length());
         }
         //Update sync ID and store metadata.
-        AudioFileData updatedAudioFileData = audioRepositoryDAO.saveAudioFile(mediaFileData);
-        return updatedAudioFileData;
+        return audioRepositoryDAO.saveAudioFile(mediaFileData);
     }
 
     @Transactional
@@ -150,22 +143,10 @@ public class AudioMediaRepositoryImpl implements AudioMediaRepository {
     }
 
     @Override
-    public List<DiscreteValueMetaDataCriteria> loadMetaDataCriteriaOptions(MetaDataCriteria<?> criteria) {
-        List<String> criteriaValues = audioRepositoryDAO.loadAudioFileCriteriaValues(criteria);
-        LOG.debug("Loaded MetaDataCriteriaValues {} for MetaDataCriteria [{}]", criteriaValues, criteria.dumpHierarchy());
-        List<DiscreteValueMetaDataCriteria> criteriaChildren = new ArrayList<DiscreteValueMetaDataCriteria>(criteriaValues.size());
-        for (String value : criteriaValues) {
-            DiscreteValueMetaDataCriteria newMetaDataCriteria = new DiscreteValueMetaDataCriteria(criteria.getId());
-            newMetaDataCriteria.setValue(value);
-            if (criteria.getParent() != null)  {
-                newMetaDataCriteria.setParent(criteria.getParent());
-            }
-            if (criteria.getChildCriteria() != null)  {
-                newMetaDataCriteria.setChildCriteria(criteria.getChildCriteria().copy());
-            }
-            criteriaChildren.add(newMetaDataCriteria);
-        }
-        return criteriaChildren;
+    public <T> List<T> loadMetaDataCriteriaOptions(MetaDataCriteria<T> metaDataCriteria) {
+        List<T> criteriaValues = audioRepositoryDAO.loadAudioFileCriteriaValues(metaDataCriteria);
+        LOG.debug("Loaded MetaDataCriteriaValues {} for MetaDataCriteria [{}]", criteriaValues, metaDataCriteria.dumpHierarchy());
+        return criteriaValues;
     }
 
     private void validateMediaFileDirectory(File directory) {

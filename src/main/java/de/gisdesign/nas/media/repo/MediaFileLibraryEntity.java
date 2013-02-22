@@ -121,7 +121,6 @@ public class MediaFileLibraryEntity implements MediaFileLibrary, Serializable {
 
     @Override
     public List<MediaRootDirectory> getRootDirectories() {
-        List<MediaRootDirectory> rootDirectories = new ArrayList<MediaRootDirectory>(this.mediaFileRootDirectories);
-        return rootDirectories;
+        return new ArrayList<MediaRootDirectory>(this.mediaFileRootDirectories);
     }
 }

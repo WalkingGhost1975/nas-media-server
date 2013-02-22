@@ -1,5 +1,6 @@
 package de.gisdesign.nas.media.repo.audio;
 
+import de.gisdesign.nas.media.domain.DiscreteValueMetaDataCriteria;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
 import de.gisdesign.nas.media.domain.audio.AudioFileData;
 import java.util.List;
@@ -18,7 +19,7 @@ interface AudioRepositoryDAO {
 
     public List<AudioFileData> findAudioFilesByCriteria(MetaDataCriteria<?> criteria);
 
-    public List<String> loadAudioFileCriteriaValues(MetaDataCriteria<?> criteria);
+    public <T> List<T> loadAudioFileCriteriaValues(MetaDataCriteria<T> criteria);
 
     public AudioFileData saveAudioFile(AudioFileData imageFileData);
 
