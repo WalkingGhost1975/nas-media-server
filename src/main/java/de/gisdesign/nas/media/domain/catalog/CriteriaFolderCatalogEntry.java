@@ -75,6 +75,12 @@ public final class CriteriaFolderCatalogEntry<M extends MediaFileData,V> impleme
     private MetaDataCriteriaFactory criteriaFactory;
 
     /**
+     * Flag to support the lazy loading of children on demand instead of building the
+     * complete hierarchy all the time.
+     */
+    private boolean initialized = false;
+
+    /**
      * Constructor.
      * @param mediaRepository The {@link MediaRepositoryService}. May not be <code>null</code>.
      * @param criteriaHierachy The {@link CriteriaFolderHierachy}.
@@ -109,15 +115,9 @@ public final class CriteriaFolderCatalogEntry<M extends MediaFileData,V> impleme
         this.metaDataCriteriaId = criteriaHierachy.getCriteria();
         this.childCriteriaFolderHierarchy = (valueString == null) ? criteriaHierachy : criteriaHierachy.getSubCriteria();
         this.value = valueString;
-
-        LOG.debug("Creating CriteriaFolderCatalogEntry for criteria [{}] with value [{}].", this.metaDataCriteriaId, valueString);
         this.path = buildPath();
-        if (isLeaf()) {
-            initializeMediaFileDataMap();
-        } else {
-            initializeChildCriteria();
-        }
-        LOG.debug("Created CriteriaFolderCatalogEntry for criteria [{}] with value [{}] successfully.", this.metaDataCriteriaId, valueString);
+
+        LOG.debug("Created CriteriaFolderCatalogEntry for criteria [{}] with value [{}].", this.metaDataCriteriaId, valueString);
     }
 
     @Override
@@ -153,6 +153,7 @@ public final class CriteriaFolderCatalogEntry<M extends MediaFileData,V> impleme
     @Override
     public int size() {
         int size;
+        initialize();
         if (isLeaf())  {
             size = this.mediaFileDataMap.size();
         } else {
@@ -164,6 +165,7 @@ public final class CriteriaFolderCatalogEntry<M extends MediaFileData,V> impleme
     @Override
     public List<CatalogEntry> getChildren() {
         LOG.debug("Assembling child CriteriaFolderCatalogEntry for criteria folder [{}].", getPath());
+        initialize();
         List<CatalogEntry> children = new ArrayList<CatalogEntry>(size());
         if (isLeaf())  {
             for (M mediaFileData : this.mediaFileDataMap.values()) {
@@ -182,6 +184,7 @@ public final class CriteriaFolderCatalogEntry<M extends MediaFileData,V> impleme
     @Override
     public boolean hasChild(String name) {
         boolean hasChild;
+        initialize();
         if (isLeaf())  {
             hasChild = this.mediaFileDataMap.containsKey(name);
         } else {
@@ -193,6 +196,7 @@ public final class CriteriaFolderCatalogEntry<M extends MediaFileData,V> impleme
     @Override
     public CatalogEntry getChild(String name) {
         CatalogEntry catalogEntry = null;
+        initialize();
         if (hasChild(name))  {
             LOG.debug("Retrieving child [{}] CriteriaFolderCatalogEntry for criteria folder [{}].", name, getPath());
             if (isLeaf())  {
@@ -312,5 +316,17 @@ public final class CriteriaFolderCatalogEntry<M extends MediaFileData,V> impleme
         return pathBuilder.toString();
     }
 
-
+    /**
+     * Lazily initializes the child elements.
+     */
+    private void initialize() {
+        if (!initialized) {
+            if (isLeaf()) {
+                initializeMediaFileDataMap();
+            } else {
+                initializeChildCriteria();
+            }
+            initialized = true;
+        }
+    }
 }
