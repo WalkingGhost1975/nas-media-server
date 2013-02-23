@@ -94,7 +94,9 @@ public class ImageFileData extends MediaFileEntity implements Serializable {
         for (int i = 0; i < 3; i++)  {
             rescaleDirectory = new File(rescaleDirectory, String.valueOf(uuid.charAt(i)));
             if (!rescaleDirectory.exists())  {
-                rescaleDirectory.mkdir();
+                if (!rescaleDirectory.mkdir()) {
+                    throw new IllegalStateException("Could not generate output directory [" + outputDirectory.getAbsolutePath() + "].");
+                }
             }
         }
         return rescaleDirectory;

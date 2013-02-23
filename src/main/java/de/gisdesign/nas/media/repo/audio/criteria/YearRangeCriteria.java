@@ -26,4 +26,9 @@ public class YearRangeCriteria extends ValueRangeMetaDataCriteria<Integer> {
     public String convertToString(Integer value) {
         return String.valueOf(value);
     }
+
+    @Override
+    protected Integer convertFromString(String stringValue) {
+        return Integer.valueOf(stringValue);
+    }
 }

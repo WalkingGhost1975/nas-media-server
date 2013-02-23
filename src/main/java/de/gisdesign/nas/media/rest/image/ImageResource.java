@@ -124,6 +124,7 @@ public class ImageResource {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
         String mt = new MimetypesFileTypeMap().getContentType(imageFile);
+        LOG.debug("Delivering Image file [{}] with content type [{}].", imageFile.getAbsolutePath(), mt);
         return Response.ok(imageFile, mt).header("Content-Disposition", "inline; filename=" + imageFile.getName()).build();
     }
 }

@@ -64,10 +64,25 @@ public abstract class MetaDataCriteria<V> {
         this.childCriteria.setParent(this);
     }
 
+    /**
+     * Returns a string representation of the {@link MetaDataCriteria} conifguration.
+     * @return The string representation.
+     */
     public abstract String getValueAsString();
 
-    public abstract void setValueAsString(String stringValue);
+    /**
+     * Parses a string representation of criteria values.
+     * @param stringValue The string value to parse.
+     * @throws IllegalArgumentException The string value could not be converted to the criteria value.
+     */
+    public abstract void setValueAsString(String stringValue) throws IllegalArgumentException;
 
+    /**
+     * Converts a single value element of this {@link MetaDataCriteria} to its
+     * string representation.
+     * @param value The single value to convert.
+     * @return The string representation.
+     */
     public abstract String convertToString(V value);
 
     /**

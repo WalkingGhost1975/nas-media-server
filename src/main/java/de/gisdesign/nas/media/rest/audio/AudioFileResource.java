@@ -71,6 +71,7 @@ public class AudioFileResource {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
         String mt = new MimetypesFileTypeMap().getContentType(audioFile);
+        LOG.debug("Delivering Audio file [{}] with content type [{}].", audioFile.getAbsolutePath(), mt);
         return Response.ok(audioFile, mt).header("Content-Disposition", "inline; filename=" + audioFile.getName()).build();
     }
 }
