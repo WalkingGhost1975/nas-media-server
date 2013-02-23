@@ -58,7 +58,7 @@ public class AudioResourceBuilder implements CatalogEntryResourceBuilder<AudioFi
         audio.setDuration(audioFileData.getMetaData().getDuration());
         audio.setGenre(audioFileData.getMetaData().getGenre());
         //Set download link
-        audio.setDownloadUri(uriInfo.getAbsolutePathBuilder().path("/download").build().toString());
+        audio.setDownloadUri(uri + "/download");
 
         return audio;
     }

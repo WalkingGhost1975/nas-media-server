@@ -1,22 +1,17 @@
 package de.gisdesign.nas.media.repo.audio;
 
 import com.beaglebuddy.mp3.MP3;
-import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
-import de.gisdesign.nas.media.domain.MetaDataCriteria;
-import de.gisdesign.nas.media.domain.MetaDataCriteriaFactory;
 import de.gisdesign.nas.media.domain.audio.AudioCatalogEntry;
 import de.gisdesign.nas.media.domain.audio.AudioFileData;
 import de.gisdesign.nas.media.domain.audio.AudioMetaData;
 import de.gisdesign.nas.media.domain.audio.Genre;
 import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
-import de.gisdesign.nas.media.repo.MediaFileLibraryManager;
+import de.gisdesign.nas.media.repo.AbstractMediaRepository;
+import de.gisdesign.nas.media.repo.MediaFileDataDAO;
 import de.gisdesign.nas.media.repo.MediaFileScanException;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +20,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- *
+ * {@link MediaRepository} implementation used for managing Audio files.
  * @author Denis Pasek
  */
 @Component
-public class AudioMediaRepositoryImpl implements AudioMediaRepository {
+public class AudioMediaRepositoryImpl extends AbstractMediaRepository<AudioFileData> implements AudioMediaRepository {
 
     /**
      * Logger.
@@ -37,32 +32,10 @@ public class AudioMediaRepositoryImpl implements AudioMediaRepository {
     private static final Logger LOG = LoggerFactory.getLogger(AudioMediaRepositoryImpl.class);
 
     @Autowired
-    private MediaFileLibraryManager mediaFileLibraryManager;
-
-    @Autowired
-    private MetaDataCriteriaFactory metaDataCriteriaFactory;
-
-    @Autowired
     private AudioRepositoryDAO audioRepositoryDAO;
 
-    @Override
-    public MetaDataCriteriaFactory getMetaDataCriteriaFactory() {
-        return metaDataCriteriaFactory;
-    }
-
-    @Override
-    public List<String> getMediaFileLibraryNames() {
-        return this.mediaFileLibraryManager.getMediaFileLibraryNames(MediaFileType.AUDIO);
-    }
-
-    @Override
-    public MediaFileLibrary getMediaFileLibrary(String libraryName) {
-        return this.mediaFileLibraryManager.getMediaFileLibrary(MediaFileType.AUDIO, libraryName);
-    }
-
-    @Override
-    public MediaFileType getSupportedMediaFileType() {
-        return MediaFileType.AUDIO;
+    public AudioMediaRepositoryImpl() {
+        super(MediaFileType.AUDIO);
     }
 
     @Override
@@ -74,18 +47,6 @@ public class AudioMediaRepositoryImpl implements AudioMediaRepository {
         return audioFile.exists() ? new AudioCatalogEntry(parent, mediaFileData) : null;
     }
 
-    @Override
-    public AudioFileData loadMediaFileData(Long id) {
-        Validate.notNull(id, "ID is null.");
-        return audioRepositoryDAO.findAudioFileById(id);
-    }
-
-    @Override
-    public AudioFileData loadMediaFileData(File audioFile) {
-        validateMediaFile(audioFile);
-        return audioRepositoryDAO.findAudioFileByAbsoluteFileName(audioFile.getAbsolutePath());
-    }
-
     @Transactional
     @Override
     public AudioFileData createMediaFileData(File audioFile) throws MediaFileScanException {
@@ -95,46 +56,12 @@ public class AudioMediaRepositoryImpl implements AudioMediaRepository {
             audioData = new AudioFileData();
             audioData.setAbsolutePath(audioFile.getParent());
             audioData.setFilename(audioFile.getName());
-            audioData.setLastModified(audioFile.lastModified());
-            audioData.setSize(audioFile.length());
-            scanAudioFileMetaData(audioFile, audioData);
-            audioData = audioRepositoryDAO.saveAudioFile(audioData);
+            scanMediaFileMetaData(audioFile, audioData);
+            audioData = audioRepositoryDAO.saveMediaFile(audioData);
         } else {
             throw new MediaFileScanException("Unsupported Audio media file [" + audioFile.getAbsolutePath() + "]");
         }
         return audioData;
-    }
-
-    @Transactional
-    @Override
-    public AudioFileData updateMediaFileData(AudioFileData mediaFileData) throws MediaFileScanException {
-        File audioFile = new File(mediaFileData.getAbsolutePath(), mediaFileData.getFilename());
-        //Only rescan meta data if timestamp has changed.
-        if (mediaFileData.hasChanged(audioFile.lastModified())) {
-            scanAudioFileMetaData(audioFile, mediaFileData);
-            mediaFileData.setLastModified(audioFile.lastModified());
-            mediaFileData.setSize(audioFile.length());
-        }
-        //Update sync ID and store metadata.
-        return audioRepositoryDAO.saveAudioFile(mediaFileData);
-    }
-
-    @Transactional
-    @Override
-    public void deleteMediaFileData(AudioFileData mediaFileData) {
-        audioRepositoryDAO.deleteAudioFile(mediaFileData);
-    }
-
-    @Override
-    public Map<String,AudioFileData> loadMediaFilesFromDirectory(File directory) {
-        validateMediaFileDirectory(directory);
-        List<AudioFileData> mediaFileDataList = audioRepositoryDAO.findAudioFilesByDirectory(directory.getAbsolutePath());
-        Map<String,AudioFileData> mediaFileDataMap = new HashMap<String, AudioFileData>(mediaFileDataList.size()*2);
-        LOG.debug("Loaded {} MediaFileData for media files in directory [{}].", mediaFileDataList.size(), directory.getAbsolutePath());
-        for (AudioFileData mediaFileData : mediaFileDataList) {
-            mediaFileDataMap.put(mediaFileData.getFilename(), mediaFileData);
-        }
-        return mediaFileDataMap;
     }
 
     @Override
@@ -145,46 +72,21 @@ public class AudioMediaRepositoryImpl implements AudioMediaRepository {
     }
 
     @Override
-    public List<AudioFileData> findMediaFilesByCriteria(MetaDataCriteria<?> criteria) {
-        List<AudioFileData> audioFiles = audioRepositoryDAO.findAudioFilesByCriteria(criteria);
-        LOG.debug("Loaded [{}] Audio files for MetaDataCriteria [{}]", audioFiles.size(), criteria.dumpHierarchy());
-        return audioFiles;
+    protected MediaFileDataDAO<AudioFileData> getMediaFileDataDAO() {
+        return audioRepositoryDAO;
     }
 
     @Override
-    public <T> List<T> loadMetaDataCriteriaOptions(MetaDataCriteria<T> metaDataCriteria) {
-        List<T> criteriaValues = audioRepositoryDAO.loadAudioFileCriteriaValues(metaDataCriteria);
-        LOG.debug("Loaded MetaDataCriteriaValues {} for MetaDataCriteria [{}]", criteriaValues, metaDataCriteria.dumpHierarchy());
-        return criteriaValues;
-    }
-
-    @Override
-    public long countMediaFilesMatchingCriteria(MetaDataCriteria<?> metaDataCriteria) {
-        long count = audioRepositoryDAO.countAudioFilesMatchingCriteria(metaDataCriteria);
-        LOG.debug("MetaDataCriteria [{}] has [{}] matching Audio files.", metaDataCriteria.dumpHierarchy(), count);
-        return count;
-    }
-
-    private void validateMediaFileDirectory(File directory) {
-        Validate.notNull(directory, "Directory is null.");
-        Validate.isTrue(directory.exists(), "Directory [" + directory.getAbsolutePath() + "] does not exist.");
-        Validate.isTrue(directory.isDirectory(), "File [" + directory.getAbsolutePath() + "] is not a directory.");
-    }
-
-    private void validateMediaFile(File audioFile) {
-        Validate.notNull(audioFile, "AudioFile is null.");
-        Validate.isTrue(audioFile.exists(), "AudioFile [" + audioFile.getAbsolutePath() + "] does not exist.");
-        Validate.isTrue(audioFile.isFile(), "AudioFile [" + audioFile.getAbsolutePath() + "] is not a file.");
-    }
-
-    private void scanAudioFileMetaData(File audioFile, AudioFileData audioData) throws MediaFileScanException {
-        if (isSupportedMediaFile(audioFile))  {
+    protected void scanMediaFileMetaData(File mediaFile, AudioFileData mediaFileData) throws MediaFileScanException {
+        if (isSupportedMediaFile(mediaFile))  {
+            mediaFileData.setLastModified(mediaFile.lastModified());
+            mediaFileData.setSize(mediaFile.length());
             try {
-                MP3 metadata = new MP3(audioFile);
+                MP3 metadata = new MP3(mediaFile);
                 if (metadata.hasErrors())  {
-                    LOG.warn("MP3 tag errors for MP3 file [{}]: {}", audioFile.getAbsolutePath(), metadata.getErrors());
+                    LOG.warn("MP3 tag errors for MP3 file [{}]: {}", mediaFile.getAbsolutePath(), metadata.getErrors());
                 }
-                AudioMetaData audioMetaData = audioData.getMetaData();
+                AudioMetaData audioMetaData = mediaFileData.getMetaData();
                 audioMetaData.setAlbum(metadata.getAlbum());
                 audioMetaData.setAlbumArtist(metadata.getBand());
                 audioMetaData.setArtist(metadata.getBand());
@@ -199,9 +101,8 @@ public class AudioMediaRepositoryImpl implements AudioMediaRepository {
                 audioMetaData.setTrackNumber(metadata.getTrack());
                 audioMetaData.setDuration(metadata.getAudioDuration());
             } catch (IOException ex)  {
-                throw new MediaFileScanException("IO error during extraction of meta information for Audio file [" + audioFile.getAbsolutePath() + "].", ex);
+                throw new MediaFileScanException("IO error during extraction of meta information for Audio file [" + mediaFileData.getAbsolutePath() + "].", ex);
             }
         }
     }
-
 }

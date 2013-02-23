@@ -6,10 +6,7 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import de.gisdesign.nas.media.admin.ConfigurationService;
-import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
-import de.gisdesign.nas.media.domain.MetaDataCriteria;
-import de.gisdesign.nas.media.domain.MetaDataCriteriaFactory;
 import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
 import de.gisdesign.nas.media.domain.image.ColorSpace;
 import de.gisdesign.nas.media.domain.image.FlashMode;
@@ -20,14 +17,14 @@ import de.gisdesign.nas.media.domain.image.ImageFileData;
 import de.gisdesign.nas.media.domain.image.ImageMetaData;
 import de.gisdesign.nas.media.domain.image.ImageSourceData;
 import de.gisdesign.nas.media.domain.image.WhiteBalanceMode;
-import de.gisdesign.nas.media.repo.MediaFileLibraryManager;
+import de.gisdesign.nas.media.repo.AbstractMediaRepository;
+import de.gisdesign.nas.media.repo.MediaFileDataDAO;
 import de.gisdesign.nas.media.repo.MediaFileScanException;
+import de.gisdesign.nas.media.repo.MediaRepository;
 import static de.gisdesign.nas.media.repo.image.Configuration.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,11 +33,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- *
+ * {@link MediaRepository} implementation for Image media files.
  * @author Denis Pasek
  */
 @Component
-public class ImageMediaRepositoryImpl implements ImageMediaRepository {
+public class ImageMediaRepositoryImpl extends AbstractMediaRepository<ImageFileData> implements ImageMediaRepository {
 
     /**
      * Logger.
@@ -51,35 +48,13 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
     private ConfigurationService configService;
 
     @Autowired
-    private MetaDataCriteriaFactory metaDataCriteriaFactory;
-
-    @Autowired
-    private MediaFileLibraryManager mediaFileLibraryManager;
-
-    @Autowired
     private ImageRepositoryDAO imageRepositoryDAO;
 
     @Autowired
     private ThumbGenerator thumbGenerator;
 
-    @Override
-    public MetaDataCriteriaFactory getMetaDataCriteriaFactory() {
-        return metaDataCriteriaFactory;
-    }
-
-    @Override
-    public List<String> getMediaFileLibraryNames() {
-        return this.mediaFileLibraryManager.getMediaFileLibraryNames(MediaFileType.IMAGE);
-    }
-
-    @Override
-    public MediaFileLibrary getMediaFileLibrary(String libraryName) {
-        return this.mediaFileLibraryManager.getMediaFileLibrary(MediaFileType.IMAGE, libraryName);
-    }
-
-    @Override
-    public MediaFileType getSupportedMediaFileType() {
-        return MediaFileType.IMAGE;
+    public ImageMediaRepositoryImpl() {
+        super(MediaFileType.IMAGE);
     }
 
     @Override
@@ -92,18 +67,6 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
         return imageFile.exists() ? new ImageCatalogEntry(parent, imageData) : null;
     }
 
-    @Override
-    public ImageFileData loadMediaFileData(Long id) {
-        Validate.notNull(id, "ID is null.");
-        return imageRepositoryDAO.findImageById(id);
-    }
-
-    @Override
-    public ImageFileData loadMediaFileData(File imageFile) {
-        validateMediaFile(imageFile);
-        return imageRepositoryDAO.findImageByAbsoluteFileName(imageFile.getAbsolutePath());
-    }
-
     @Transactional
     @Override
     public ImageFileData createMediaFileData(File imageFile) throws MediaFileScanException {
@@ -113,46 +76,12 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
             imageData = new ImageFileData();
             imageData.setAbsolutePath(imageFile.getParent());
             imageData.setFilename(imageFile.getName());
-            imageData.setLastModified(imageFile.lastModified());
-            imageData.setSize(imageFile.length());
-            scanImageFileMetaData(imageFile, imageData);
-            imageData = imageRepositoryDAO.saveImage(imageData);
+            scanMediaFileMetaData(imageFile, imageData);
+            imageData = imageRepositoryDAO.saveMediaFile(imageData);
         } else {
             throw new MediaFileScanException("Unsupported Image media file [" + imageFile.getAbsolutePath() + "]");
         }
         return imageData;
-    }
-
-    @Transactional
-    @Override
-    public ImageFileData updateMediaFileData(ImageFileData mediaFileData) throws MediaFileScanException {
-        File imageFile = new File(mediaFileData.getAbsolutePath(), mediaFileData.getFilename());
-        //Only rescan meta data if timestamp has changed.
-        if (mediaFileData.hasChanged(imageFile.lastModified())) {
-            scanImageFileMetaData(imageFile, mediaFileData);
-            mediaFileData.setLastModified(imageFile.lastModified());
-            mediaFileData.setSize(imageFile.length());
-        }
-        //Update sync ID and store metadata.
-        return imageRepositoryDAO.saveImage(mediaFileData);
-    }
-
-    @Transactional
-    @Override
-    public void deleteMediaFileData(ImageFileData mediaFileData) {
-        imageRepositoryDAO.deleteImage(mediaFileData);
-    }
-
-    @Override
-    public Map<String,ImageFileData> loadMediaFilesFromDirectory(File directory) {
-        validateMediaFileDirectory(directory);
-        Map<String,ImageFileData> mediaFileDataMap = new HashMap<String, ImageFileData>();
-        List<ImageFileData> mediaFileDataList = imageRepositoryDAO.findImagesByDirectory(directory.getAbsolutePath());
-        LOG.debug("Loaded {} MediaFileData for media files in directory [{}].", mediaFileDataList.size(), directory.getAbsolutePath());
-        for (ImageFileData mediaFileData : mediaFileDataList) {
-            mediaFileDataMap.put(mediaFileData.getFilename(), mediaFileData);
-        }
-        return mediaFileDataMap;
     }
 
     @Override
@@ -160,27 +89,6 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
         validateMediaFile(imageFile);
         //TODO: Extend check for supported image files.
         return imageFile.getName().toLowerCase().endsWith("jpg");
-    }
-
-    @Override
-    public List<ImageFileData> findMediaFilesByCriteria(MetaDataCriteria<?> criteria) {
-        List<ImageFileData> imageFiles = imageRepositoryDAO.findImagesByCriteria(criteria);
-        LOG.debug("Loaded [{}] Image files for MetaDataCriteria [{}]", imageFiles.size(), criteria.dumpHierarchy());
-        return imageFiles;
-    }
-
-    @Override
-    public <T> List<T> loadMetaDataCriteriaOptions(MetaDataCriteria<T> metaDataCriteria) {
-        List<T> criteriaValues = imageRepositoryDAO.loadImageCriteriaValues(metaDataCriteria);
-        LOG.debug("Loaded MetaDataCriteriaValues {} for MetaDataCriteria [{}]", criteriaValues, metaDataCriteria.dumpHierarchy());
-        return criteriaValues;
-    }
-
-    @Override
-    public long countMediaFilesMatchingCriteria(MetaDataCriteria<?> metaDataCriteria) {
-        long count = imageRepositoryDAO.countImagesMatchingCriteria(metaDataCriteria);
-        LOG.debug("MetaDataCriteria [{}] has [{}] matching Image files.", metaDataCriteria.dumpHierarchy(), count);
-        return count;
     }
 
     @Override
@@ -226,13 +134,36 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
                     count += thumbGenerator.generateScaledImages(imageData, outputDirectory, slideShowHeight, thumbSizeBig, thumbSizeSmall);
                 } else {
                     LOG.debug("Removing non-existent image file [{}] in directory [{}].", imageData.getFilename(), imageData.getAbsolutePath());
-                    imageRepositoryDAO.deleteImage(imageData);
+                    imageRepositoryDAO.deleteMediaFile(imageData);
                 }
             }
             finished |= imageDataList.size() < batchSize;
             index += batchSize;
         }
         LOG.info("Generation of slide show images [Size: {}] and thumb nails [Size: {},{}] to directory [{}] completed. [{}] rescaled images created.", slideShowHeight, thumbSizeBig, thumbSizeSmall, outputDirectory.getAbsolutePath(), count);
+    }
+
+    @Override
+    protected MediaFileDataDAO<ImageFileData> getMediaFileDataDAO() {
+        return imageRepositoryDAO;
+    }
+
+    @Override
+    protected void scanMediaFileMetaData(File mediaFile, ImageFileData mediaFileData) throws MediaFileScanException {
+        if (isSupportedMediaFile(mediaFile))  {
+            mediaFileData.setLastModified(mediaFile.lastModified());
+            mediaFileData.setSize(mediaFile.length());
+            try {
+                Metadata metadata = ImageMetadataReader.readMetadata(mediaFile);
+                //Map the EXIF directory of image file
+                mapEXIFIFD0Directory(mediaFileData.getMetaData(), metadata);
+                mapExifSubIFDDirectory(mediaFileData.getMetaData(), metadata);
+            } catch (ImageProcessingException ex)  {
+                throw new MediaFileScanException("Extraction of metainformation for Image file [" + mediaFile.getAbsolutePath() + "] failed.", ex);
+            } catch (IOException ex)  {
+                throw new MediaFileScanException("IO error during extraction of meta information for Image file [" + mediaFile.getAbsolutePath() + "].", ex);
+            }
+        }
     }
 
     /**
@@ -242,33 +173,6 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
      */
     private boolean checkRescaledImageExistence(File rescaledImage)  {
         return rescaledImage.exists() && rescaledImage.isFile();
-    }
-
-    private void validateMediaFileDirectory(File directory) {
-        Validate.notNull(directory, "Directory is null.");
-        Validate.isTrue(directory.exists(), "Directory [" + directory.getAbsolutePath() + "] does not exist.");
-        Validate.isTrue(directory.isDirectory(), "File [" + directory.getAbsolutePath() + "] is not a directory.");
-    }
-
-    private void validateMediaFile(File imageFile) {
-        Validate.notNull(imageFile, "ImageFile is null.");
-        Validate.isTrue(imageFile.exists(), "ImageFile [" + imageFile.getAbsolutePath() + "] does not exist.");
-        Validate.isTrue(imageFile.isFile(), "ImageFile [" + imageFile.getAbsolutePath() + "] is not a file.");
-    }
-
-    private void scanImageFileMetaData(File imageFile, ImageFileData imageData) throws MediaFileScanException {
-        if (isSupportedMediaFile(imageFile))  {
-            try {
-                Metadata metadata = ImageMetadataReader.readMetadata(imageFile);
-                //Map the EXIF directory of image file
-                mapEXIFIFD0Directory(imageData.getMetaData(), metadata);
-                mapExifSubIFDDirectory(imageData.getMetaData(), metadata);
-            } catch (ImageProcessingException ex)  {
-                throw new MediaFileScanException("Extraction of metainformation for Image file [" + imageFile.getAbsolutePath() + "] failed.", ex);
-            } catch (IOException ex)  {
-                throw new MediaFileScanException("IO error during extraction of meta information for Image file [" + imageFile.getAbsolutePath() + "].", ex);
-            }
-        }
     }
 
     private void mapExifSubIFDDirectory(ImageMetaData metaData, Metadata exifMetadata)  {
