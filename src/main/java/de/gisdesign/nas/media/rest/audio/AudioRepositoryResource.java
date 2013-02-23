@@ -4,7 +4,6 @@ import de.gisdesign.nas.media.domain.audio.AudioFileData;
 import de.gisdesign.nas.media.repo.audio.AudioFileScanner;
 import de.gisdesign.nas.media.repo.audio.AudioMediaRepository;
 import de.gisdesign.nas.media.rest.CatalogDTO;
-import de.gisdesign.nas.media.rest.CatalogEntryResourceBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;

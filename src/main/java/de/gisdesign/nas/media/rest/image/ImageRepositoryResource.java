@@ -122,7 +122,7 @@ public class ImageRepositoryResource {
      */
     @Path("/file/{id}")
     public ImageResource getById(@PathParam("id") Long id) {
-        LOG.debug("Creating AudioFileResource.");
+        LOG.debug("Creating ImageFileResource.");
         ImageFileData imageFileData = imageRepository.loadMediaFileData(id);
         if (imageFileData == null)  {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
