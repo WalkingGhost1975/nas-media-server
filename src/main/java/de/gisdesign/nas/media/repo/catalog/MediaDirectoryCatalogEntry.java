@@ -1,6 +1,7 @@
-package de.gisdesign.nas.media.domain.catalog;
+package de.gisdesign.nas.media.repo.catalog;
 
 import de.gisdesign.nas.media.domain.MediaFileData;
+import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
 import de.gisdesign.nas.media.repo.MediaFileScanException;
 import de.gisdesign.nas.media.repo.MediaRepository;
 import java.io.File;

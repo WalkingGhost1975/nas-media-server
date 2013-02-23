@@ -1,8 +1,8 @@
 package de.gisdesign.nas.media.rest.image;
 
-import de.gisdesign.nas.media.domain.catalog.CriteriaFolderCatalogEntry;
 import de.gisdesign.nas.media.domain.catalog.CriteriaFolderHierachy;
 import de.gisdesign.nas.media.domain.image.ImageFileData;
+import de.gisdesign.nas.media.repo.catalog.CriteriaFolderCatalogEntry;
 import de.gisdesign.nas.media.repo.image.ImageFileScanner;
 import de.gisdesign.nas.media.repo.image.ImageMediaRepository;
 import de.gisdesign.nas.media.rest.CatalogDTO;

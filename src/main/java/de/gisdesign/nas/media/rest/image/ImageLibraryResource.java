@@ -2,7 +2,7 @@ package de.gisdesign.nas.media.rest.image;
 
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaRootDirectory;
-import de.gisdesign.nas.media.domain.catalog.MediaDirectoryCatalogEntry;
+import de.gisdesign.nas.media.repo.catalog.MediaDirectoryCatalogEntry;
 import de.gisdesign.nas.media.domain.image.ImageFileData;
 import de.gisdesign.nas.media.repo.image.ImageMediaRepository;
 import de.gisdesign.nas.media.rest.CatalogEntryFolderResource;

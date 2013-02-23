@@ -1,8 +1,10 @@
-package de.gisdesign.nas.media.domain.catalog;
+package de.gisdesign.nas.media.repo.catalog;
 
 import de.gisdesign.nas.media.domain.MediaFileData;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
 import de.gisdesign.nas.media.domain.MetaDataCriteriaFactory;
+import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
+import de.gisdesign.nas.media.domain.catalog.CriteriaFolderHierachy;
 import de.gisdesign.nas.media.repo.MediaRepository;
 import java.security.Principal;
 import java.util.ArrayList;
