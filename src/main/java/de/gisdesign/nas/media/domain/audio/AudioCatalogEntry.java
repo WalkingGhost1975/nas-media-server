@@ -21,7 +21,7 @@ public class AudioCatalogEntry extends DefaultMediaFileCatalogEntry {
      * @param audioFileData
      */
     public AudioCatalogEntry(CatalogEntry parent, AudioFileData audioFileData) {
-        super(new File(audioFileData.getAbsolutePath(), audioFileData.getFilename()), parent);
+        super(audioFileData.getId(), new File(audioFileData.getAbsolutePath(), audioFileData.getFilename()), parent);
         this.audioFileData = audioFileData;
     }
 

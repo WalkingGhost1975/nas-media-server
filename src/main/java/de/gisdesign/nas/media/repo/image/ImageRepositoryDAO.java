@@ -21,6 +21,8 @@ interface ImageRepositoryDAO {
 
     public List<ImageFileData> findImagesByCriteria(MetaDataCriteria<?> criteria);
 
+    public long countImagesMatchingCriteria(MetaDataCriteria<?> metaDataCriteria);
+
     public List<ImageFileData> findImagesForRescaling(int index, int batchSize);
 
     public <T> List<T> loadImageCriteriaValues(MetaDataCriteria<T> criteria);

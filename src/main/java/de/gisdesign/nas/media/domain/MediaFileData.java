@@ -7,6 +7,12 @@ package de.gisdesign.nas.media.domain;
 public interface MediaFileData {
 
     /**
+     * Returns the unique ID of the media file.
+     * @return The unique ID.
+     */
+    public Long getId();
+
+    /**
      * Retrurns the absolute path of the media file directory the media file can be found.
      * @return The location of the media file.
      */

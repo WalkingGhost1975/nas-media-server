@@ -12,6 +12,10 @@ public abstract class DefaultMediaFileCatalogEntry implements MediaFileCatalogEn
     /**
      * The referenced audio {@link File}.
      */
+    private Long id;
+    /**
+     * The referenced audio {@link File}.
+     */
     private File mediaFile;
     /**
      * The parent {@link CatalogEntry}.
@@ -22,7 +26,8 @@ public abstract class DefaultMediaFileCatalogEntry implements MediaFileCatalogEn
      */
     private String path;
 
-    public DefaultMediaFileCatalogEntry(File mediaFile, CatalogEntry parent) {
+    public DefaultMediaFileCatalogEntry(Long id, File mediaFile, CatalogEntry parent) {
+        this.id = id;
         this.mediaFile = mediaFile;
         this.parent = parent;
         this.path = (parent != null) ? parent.getPath() : "/";
@@ -50,7 +55,7 @@ public abstract class DefaultMediaFileCatalogEntry implements MediaFileCatalogEn
 
     @Override
     public String getName() {
-        return mediaFile.getName();
+        return String.valueOf(id);
     }
 
     @Override
@@ -84,7 +89,7 @@ public abstract class DefaultMediaFileCatalogEntry implements MediaFileCatalogEn
     }
 
     @Override
-    public int size() {
+    public long size() {
         return 0;
     }
 

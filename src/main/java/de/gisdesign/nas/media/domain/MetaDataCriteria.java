@@ -99,6 +99,7 @@ public abstract class MetaDataCriteria<V> {
         while (currentCriteria != null) {
             StringBuilder criteria = new StringBuilder();
             criteria.append(currentCriteria.getId());
+            criteria.append('[').append(currentCriteria.getValueAsString()).append(']');
             if (level > 0) {
                 criteria.append("/");
             }

@@ -149,6 +149,13 @@ public class AudioMediaRepositoryImpl implements AudioMediaRepository {
         return criteriaValues;
     }
 
+    @Override
+    public long countMediaFilesMatchingCriteria(MetaDataCriteria<?> metaDataCriteria) {
+        long count = audioRepositoryDAO.countAudioFilesMatchingCriteria(metaDataCriteria);
+        LOG.debug("MetaDataCriteria [{}] has [{}] matching Audio files.", metaDataCriteria.dumpHierarchy(), count);
+        return count;
+    }
+
     private void validateMediaFileDirectory(File directory) {
         Validate.notNull(directory, "Directory is null.");
         Validate.isTrue(directory.exists(), "Directory [" + directory.getAbsolutePath() + "] does not exist.");

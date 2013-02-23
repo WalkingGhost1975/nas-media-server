@@ -46,7 +46,7 @@ public interface CatalogEntry {
      * {@link #isFolder()} returns <code>true</code>.
      * @return The number of children.
      */
-    public int size();
+    public long size();
 
     /**
      * Returns all the children {@link CatalogEntry}s of this {@link CatalogEntry}. Will

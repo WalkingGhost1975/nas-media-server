@@ -112,6 +112,13 @@ public interface MediaRepository<M extends MediaFileData> {
     public List<M> findMediaFilesByCriteria(MetaDataCriteria<?> mediaMetaDataCriteria);
 
     /**
+     * Counts the number of media files matching the meta data criteria.
+     * @param metaDataCriteria The leaf of the meta data criteria tree.
+     * @return The number of media files.
+     */
+    public long countMediaFilesMatchingCriteria(MetaDataCriteria<?> metaDataCriteria);
+
+    /**
      * Loads the available options for a meta data criteria. Uses the parent criteria for
      * filtering and the leaf criteria which should not have a value set as option
      * criteria.

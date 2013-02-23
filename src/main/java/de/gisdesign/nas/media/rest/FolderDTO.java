@@ -11,12 +11,12 @@ public class FolderDTO extends NodeDTO {
 
     private String category;
 
-    private int count;
+    private long count;
 
     public FolderDTO() {
     }
 
-    public FolderDTO(String category, String name, String uri, int count) {
+    public FolderDTO(String category, String name, String uri, long count) {
         super(name, uri);
         this.category = category;
         this.count = count;
@@ -30,7 +30,7 @@ public class FolderDTO extends NodeDTO {
         this.category = category;
     }
 
-    public int getCount() {
+    public long getCount() {
         return count;
     }
 

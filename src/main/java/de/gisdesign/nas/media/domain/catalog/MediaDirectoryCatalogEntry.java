@@ -90,7 +90,7 @@ public class MediaDirectoryCatalogEntry<M extends MediaFileData> implements Cata
     }
 
     @Override
-    public int size() {
+    public long size() {
         long start = System.currentTimeMillis();
         File[] children = file.listFiles();
         int size = 0;

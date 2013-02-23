@@ -82,6 +82,16 @@ class ImageRepositoryDAOImpl implements ImageRepositoryDAO {
     }
 
     @Override
+    public long countImagesMatchingCriteria(MetaDataCriteria<?> criteria) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Long> query = cb.createQuery(Long.class);
+        Root<ImageFileData> root = query.from(ImageFileData.class);
+        query.select(cb.count(root));
+        Predicate filter = assembleQueryFilter(criteria, cb, root);
+        return em.createQuery(query.where(filter)).getSingleResult();
+    }
+
+    @Override
     public <T> List<T> loadImageCriteriaValues(MetaDataCriteria<T> criteria) {
         //Prepare Query
         CriteriaBuilder cb = em.getCriteriaBuilder();

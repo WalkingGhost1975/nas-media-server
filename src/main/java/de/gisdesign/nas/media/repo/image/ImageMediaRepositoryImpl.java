@@ -168,6 +168,13 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
     }
 
     @Override
+    public long countMediaFilesMatchingCriteria(MetaDataCriteria<?> metaDataCriteria) {
+        long count = imageRepositoryDAO.countImagesMatchingCriteria(metaDataCriteria);
+        LOG.debug("MetaDataCriteria [{}] has [{}] matching Image files.", metaDataCriteria.dumpHierarchy(), count);
+        return count;
+    }
+
+    @Override
     public ScaledImageResources getScaledImageResources(ImageFileData imageFileData) {
         Validate.notNull(imageFileData, "ImageFileData is null.");
         File outputDirectory = determineOutputDirectory();

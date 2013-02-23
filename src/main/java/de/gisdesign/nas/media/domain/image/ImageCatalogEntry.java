@@ -21,7 +21,7 @@ public class ImageCatalogEntry extends DefaultMediaFileCatalogEntry {
      * @param imageData
      */
     public ImageCatalogEntry(CatalogEntry parent, ImageFileData imageData) {
-        super(new File(imageData.getAbsolutePath(), imageData.getFilename()), parent);
+        super(imageData.getId(), new File(imageData.getAbsolutePath(), imageData.getFilename()), parent);
         this.imageData = imageData;
     }
 

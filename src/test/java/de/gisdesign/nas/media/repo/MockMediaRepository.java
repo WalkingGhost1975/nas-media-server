@@ -110,4 +110,9 @@ public class MockMediaRepository implements MediaRepository<ImageFileData> {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public long countMediaFilesMatchingCriteria(MetaDataCriteria<?> metaDataCriteria) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }
