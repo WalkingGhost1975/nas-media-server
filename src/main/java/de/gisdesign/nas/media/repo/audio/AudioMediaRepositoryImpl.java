@@ -4,6 +4,7 @@ import com.beaglebuddy.mp3.MP3;
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
+import de.gisdesign.nas.media.domain.MetaDataCriteriaFactory;
 import de.gisdesign.nas.media.domain.audio.AudioCatalogEntry;
 import de.gisdesign.nas.media.domain.audio.AudioFileData;
 import de.gisdesign.nas.media.domain.audio.AudioMetaData;
@@ -39,7 +40,15 @@ public class AudioMediaRepositoryImpl implements AudioMediaRepository {
     private MediaFileLibraryManager mediaFileLibraryManager;
 
     @Autowired
+    private MetaDataCriteriaFactory metaDataCriteriaFactory;
+
+    @Autowired
     private AudioRepositoryDAO audioRepositoryDAO;
+
+    @Override
+    public MetaDataCriteriaFactory getMetaDataCriteriaFactory() {
+        return metaDataCriteriaFactory;
+    }
 
     @Override
     public List<String> getMediaFileLibraryNames() {

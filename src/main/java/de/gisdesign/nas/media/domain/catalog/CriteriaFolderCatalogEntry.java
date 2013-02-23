@@ -100,7 +100,7 @@ public final class CriteriaFolderCatalogEntry<M extends MediaFileData,V> impleme
         Validate.notNull(mediaRepository, "MediaRepository is null");
         Validate.notNull(criteriaHierachy, "CriteriaFolderHierachy is null");
         this.mediaRepository = mediaRepository;
-        this.criteriaFactory = criteriaHierachy.getCriteriaFactory();
+        this.criteriaFactory = mediaRepository.getMetaDataCriteriaFactory();
         this.parent = parent;
         this.metaDataCriteriaId = criteriaHierachy.getCriteria();
         this.childCriteriaFolderHierarchy = (valueString == null) ? criteriaHierachy : criteriaHierachy.getSubCriteria();

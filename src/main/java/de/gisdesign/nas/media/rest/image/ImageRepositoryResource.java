@@ -1,6 +1,5 @@
 package de.gisdesign.nas.media.rest.image;
 
-import de.gisdesign.nas.media.domain.MetaDataCriteriaFactory;
 import de.gisdesign.nas.media.domain.catalog.CriteriaFolderCatalogEntry;
 import de.gisdesign.nas.media.domain.catalog.CriteriaFolderHierachy;
 import de.gisdesign.nas.media.domain.image.ImageFileData;
@@ -9,7 +8,6 @@ import de.gisdesign.nas.media.repo.image.ImageMediaRepository;
 import de.gisdesign.nas.media.rest.CatalogDTO;
 import de.gisdesign.nas.media.rest.CatalogEntryFolderResource;
 import de.gisdesign.nas.media.rest.CatalogEntryResourceBuilder;
-import de.gisdesign.nas.media.rest.audio.AudioFileResource;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -53,12 +51,6 @@ public class ImageRepositoryResource {
      */
     @Autowired
     private ImageFileScanner imageFileScanner;
-
-    /**
-     * The {@link MetaDataCriteriaFactory}.
-     */
-    @Autowired
-    private MetaDataCriteriaFactory criteriaFactory;
 
     /**
      * The {@link CatalogEntryResourceBuilder}.
@@ -108,7 +100,7 @@ public class ImageRepositoryResource {
 
     @Path("/byYearAndMonth")
     public CatalogEntryFolderResource getByYearAndMonth() {
-        CriteriaFolderHierachy hierarchy = new CriteriaFolderHierachy(criteriaFactory);
+        CriteriaFolderHierachy hierarchy = new CriteriaFolderHierachy();
         hierarchy.addCriteria("image:creationDateYear");
         hierarchy.addCriteria("image:creationDateMonth");
         CriteriaFolderCatalogEntry<ImageFileData,Integer> catalogEntry = new CriteriaFolderCatalogEntry<ImageFileData,Integer>(imageRepository, hierarchy);
@@ -117,7 +109,7 @@ public class ImageRepositoryResource {
 
     @Path("/byTag")
     public CatalogEntryFolderResource getByTag() {
-        CriteriaFolderHierachy hierarchy = new CriteriaFolderHierachy(criteriaFactory);
+        CriteriaFolderHierachy hierarchy = new CriteriaFolderHierachy();
         hierarchy.addCriteria("image:tags");
         CriteriaFolderCatalogEntry<ImageFileData,Integer> catalogEntry = new CriteriaFolderCatalogEntry<ImageFileData,Integer>(imageRepository, hierarchy);
         return new CatalogEntryFolderResource(resourceBuilder, catalogEntry, uriInfo);

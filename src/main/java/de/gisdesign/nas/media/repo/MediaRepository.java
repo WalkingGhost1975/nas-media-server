@@ -4,6 +4,7 @@ import de.gisdesign.nas.media.domain.MediaFileData;
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
+import de.gisdesign.nas.media.domain.MetaDataCriteriaFactory;
 import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
 import java.io.File;
 import java.util.List;
@@ -103,6 +104,12 @@ public interface MediaRepository<M extends MediaFileData> {
      * directory.
      */
     public Map<String,M> loadMediaFilesFromDirectory(File mediaDirectory);
+
+    /**
+     * Retrieves the {@link MetaDataCriteriaFactory}.
+     * @return The {@link MetaDataCriteriaFactory}.
+     */
+    public MetaDataCriteriaFactory getMetaDataCriteriaFactory();
 
     /**
      * Finds all media files matching the given meta data criteria.

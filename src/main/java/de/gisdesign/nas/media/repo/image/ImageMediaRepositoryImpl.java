@@ -9,6 +9,7 @@ import de.gisdesign.nas.media.admin.ConfigurationService;
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
+import de.gisdesign.nas.media.domain.MetaDataCriteriaFactory;
 import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
 import de.gisdesign.nas.media.domain.image.ColorSpace;
 import de.gisdesign.nas.media.domain.image.FlashMode;
@@ -50,6 +51,9 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
     private ConfigurationService configService;
 
     @Autowired
+    private MetaDataCriteriaFactory metaDataCriteriaFactory;
+
+    @Autowired
     private MediaFileLibraryManager mediaFileLibraryManager;
 
     @Autowired
@@ -57,6 +61,11 @@ public class ImageMediaRepositoryImpl implements ImageMediaRepository {
 
     @Autowired
     private ThumbGenerator thumbGenerator;
+
+    @Override
+    public MetaDataCriteriaFactory getMetaDataCriteriaFactory() {
+        return metaDataCriteriaFactory;
+    }
 
     @Override
     public List<String> getMediaFileLibraryNames() {

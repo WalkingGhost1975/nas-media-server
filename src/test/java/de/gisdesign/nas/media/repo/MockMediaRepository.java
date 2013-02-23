@@ -3,6 +3,7 @@ package de.gisdesign.nas.media.repo;
 import de.gisdesign.nas.media.domain.MediaFileLibrary;
 import de.gisdesign.nas.media.domain.MediaFileType;
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
+import de.gisdesign.nas.media.domain.MetaDataCriteriaFactory;
 import de.gisdesign.nas.media.domain.catalog.CatalogEntry;
 import de.gisdesign.nas.media.domain.image.ImageFileData;
 import java.io.File;
@@ -112,6 +113,11 @@ public class MockMediaRepository implements MediaRepository<ImageFileData> {
 
     @Override
     public long countMediaFilesMatchingCriteria(MetaDataCriteria<?> metaDataCriteria) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public MetaDataCriteriaFactory getMetaDataCriteriaFactory() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

@@ -1,7 +1,6 @@
 package de.gisdesign.nas.media.domain.catalog;
 
 import de.gisdesign.nas.media.domain.MetaDataCriteria;
-import de.gisdesign.nas.media.domain.MetaDataCriteriaFactory;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,24 +11,13 @@ import java.util.List;
  */
 public class CriteriaFolderHierachy {
 
-    /**
-     * The {@link MetaDataCriteriaFactory}.
-     */
-    private MetaDataCriteriaFactory criteriaFactory;
-
     private List<String> criteriaIds = new LinkedList<String>();
 
-    public CriteriaFolderHierachy(MetaDataCriteriaFactory criteriaFactory) {
-        this.criteriaFactory = criteriaFactory;
+    public CriteriaFolderHierachy() {
     }
 
-    private CriteriaFolderHierachy(MetaDataCriteriaFactory criteriaFactory, List<String> criteriaIds) {
-        this(criteriaFactory);
+    private CriteriaFolderHierachy(List<String> criteriaIds) {
         this.criteriaIds = criteriaIds;
-    }
-
-    public MetaDataCriteriaFactory getCriteriaFactory() {
-        return criteriaFactory;
     }
 
     /**
@@ -57,7 +45,7 @@ public class CriteriaFolderHierachy {
         if (subCriteriaList.size() > 0) {
             subCriteriaList.remove(0);
         }
-        return new CriteriaFolderHierachy(criteriaFactory, subCriteriaList);
+        return new CriteriaFolderHierachy(subCriteriaList);
     }
 
     public boolean hasSubCriteria()  {
