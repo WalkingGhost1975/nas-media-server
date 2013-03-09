@@ -1,17 +1,16 @@
 NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
 
-    Views.ImagesLayout = Marionette.Layout.extend({
-        template: '#template-image-view',
+    Views.AudioLayout = Marionette.Layout.extend({
+        template: '#template-audio-view',
         regions: {
             sidebar: '#sidebar',
             breadcrumbs: '#breadcrumbs',
             content: '#content'
         },
         initialize: function() {
-            this.contentView = new App.Views.ImagesView();
-
+            //Prepare view
             this.catalogsView = new App.Views.CatalogsView({
-                itemView: App.Views.ImageCatalogView,
+                itemView: App.Views.AudioCatalogView,
                 collection: this.model.catalogs
             });
             this.breadcrumbsView = new App.Views.BreadcrumbsView({
@@ -19,22 +18,22 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             });
         },
         onRender: function() {
-            this.content.show(this.contentView);
-            this.breadcrumbs.show(this.breadcrumbsView);
             this.sidebar.show(this.catalogsView);
+            this.breadcrumbs.show(this.breadcrumbsView);
         }
     });
 
-    Views.ImageView = Marionette.ItemView.extend({
-        tagName: 'li',
-        className: 'span2',
-        template: '#template-image',
+
+    Views.AudioFileView = Marionette.ItemView.extend({
+        tagName: 'tr',
+        template: '#template-audio-file'
     });
 
-    Views.ImagesView = Marionette.CollectionView.extend({
-        tagName: 'ul',
-        className: 'thumbnails',
-        itemView: Views.ImageView,
+    Views.AudioFilesView = Marionette.CollectionView.extend({
+        tagName: '',
+        itemView: Views.AudioFileView,
+        itemViewContainer: '#content'
     });
+
 });
 

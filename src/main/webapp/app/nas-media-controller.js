@@ -3,11 +3,11 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
     NasMediaController.Router = Marionette.AppRouter.extend({
         appRoutes: {
             'home': 'showHome',
-            'audio': 'showMusic',
+            'audio': 'showAudio',
             'images': 'showImages',
-            'audio/:catalog': 'showMusic',
+            'audio/:catalog': 'showAudio',
             'images/:catalog': 'showImages',
-            'audio/:catalog/*musicPath': 'showMusic',
+            'audio/:catalog/*audioPath': 'showAudio',
             'images/:catalog/*imagePath': 'showImages'
         }
     });
@@ -15,8 +15,8 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
     controller = {
         pages: {
             'home': App.Layout.Home,
-            'audio': App.Layout.Music,
-            'images': App.Layout.Images
+            'audio': App.Views.AudioLayout,
+            'images': App.Views.ImagesLayout
         },
         // Start the app by showing the appropriate views
         start: function() {
@@ -34,8 +34,8 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
             this.model.set({'page': 'home'});
             this.displayMediaPlayer();
         },
-        showMusic: function(catalog, path) {
-            this.model.catalogs = new App.Music.MusicCatalogCollection();
+        showAudio: function(catalog, path) {
+            this.model.catalogs = new App.Audio.AudioCatalogCollection();
             this._configureMediaModel('audio',catalog, path);
             this.displayMediaPlayer();
         },
