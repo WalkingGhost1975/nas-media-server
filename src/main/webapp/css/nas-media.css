@@ -1,0 +1,4 @@
+.row-fluid ul.thumbnails li.span2:nth-child(6n + 7) { margin-left : 0px; }
+.thumbnail {
+    height: 160px;
+}

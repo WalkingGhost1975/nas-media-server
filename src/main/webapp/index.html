@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="css/bootstrap.css"  />
         <link rel="stylesheet" href="css/bootstrap-responsive.css"  />
+        <link rel="stylesheet" href="css/nas-media.css"  />
     </head>
     <body>
         <div id="region-navigation" class="navbar navbar-inverse"></div>
@@ -56,26 +57,33 @@
                 </div>
             </div>
         </script>
-        <script type="text/html" id="template-image-view">
+        <script type="text/html" id="template-image-page-layout">
             <div class="row-fluid">
                 <div id="sidebar" class="span2 well well-small">
-                    Images Sidebar
                 </div>
                 <div id="main" class="span10">
                     <div class="row-fluid">
-                        <div id="breadcrumbs" class="span10">
-                            Images Breadcrumbs
+                        <div id="breadcrumbs" class="span12">
                         </div>
                     </div>
                     <div class="row-fluid">
-                        <div id="content" class="span10">
-                            Images Content
+                        <div id="content" class="span12">
                         </div>
                     </div>
                 </div>
             </div>
         </script>
-        <script type="text/html" id="template-audio-view">
+        <script type="text/html" id="template-image-content-layout">
+            <div class="row-fluid" >
+                <div id="folders" class="span12">
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div id="files" class="span12">
+                </div>
+            </div>
+        </script>
+        <script type="text/html" id="template-audio-page-layout">
             <div class="row-fluid">
                 <div id="sidebar" class="span2 well well-small">
                     Music Sidebar
@@ -105,13 +113,18 @@
         </script>
         <script type="text/html" id="template-folder">
              <a href="#<%- href ->" class="thumbnail">
-                <img src="images/folder.jpg" class="img-polaroid">
+                <img src="img/folder.jpg" class="img-polaroid">
              </a>
         </script>
         <script type="text/html" id="template-image">
-             <a href="#" class="thumbnail">
-                <img src="<%- thumbSmallUri %>" class="img-polaroid">
-             </a>
+             <div class="thumbnail">
+                <a href="#">
+                   <img src="<%- thumbSmallUri %>" class="img-polaroid">
+                </a>
+                <div class="caption">
+                    <h5><%- name %></h5>
+                </div>
+             </div>
         </script>
         <script type="text/javascript" src="libs/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="libs/underscore.js"></script>

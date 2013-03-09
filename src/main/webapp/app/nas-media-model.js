@@ -12,9 +12,18 @@ NasMediaApp.module('Model', function(Model, App, Backbone, Marionette, $, _){
     initialize : function() {
         this.on('change:catalog', this._resetPath);
         this.on('change:catalog', this._createBreadcrumbs);
-        this.on('change:catalog', this._createMediaCollection);
         this.on('change:path', this._createBreadcrumbs);
-        this.on('change:path', this._createMediaCollection);
+    },
+
+    buildUrl : function()  {
+        var url = 'repo/' + this.get('page');
+        if (this.has('catalog'))  {
+            url += '/' + this.get('catalog');
+            if (this.has('path'))  {
+                url += '/' + this.get('path');
+            }
+        }
+        return url;
     },
 
     getSelectedCatalog  : function()  {
@@ -36,12 +45,6 @@ NasMediaApp.module('Model', function(Model, App, Backbone, Marionette, $, _){
 
     syncFromCatalogCollection  : function()  {
         this.set({catalog : this.getSelectedCatalog().get('name')});
-    },
-
-    _createMediaCollection : function()  {
-        this.mediaCollection = new Backbone.Collection({
-            url : ('repo/' + this.page + '/' + this.catalog + this.path)
-        });
     },
 
     _createBreadcrumbs : function()  {

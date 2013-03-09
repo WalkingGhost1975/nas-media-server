@@ -1,7 +1,7 @@
 NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
 
-    Views.AudioLayout = Marionette.Layout.extend({
-        template: '#template-audio-view',
+    Views.AudioPageLayout = Marionette.Layout.extend({
+        template: '#template-audio-page-layout',
         regions: {
             sidebar: '#sidebar',
             breadcrumbs: '#breadcrumbs',

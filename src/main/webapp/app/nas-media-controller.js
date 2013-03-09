@@ -15,8 +15,8 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
     controller = {
         pages: {
             'home': App.Layout.Home,
-            'audio': App.Views.AudioLayout,
-            'images': App.Views.ImagesLayout
+            'audio': App.Views.AudioPageLayout,
+            'images': App.Views.ImagesPageLayout
         },
         // Start the app by showing the appropriate views
         start: function() {

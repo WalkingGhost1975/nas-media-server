@@ -46,4 +46,19 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
         }
     });
 
+    Views.FolderView = Marionette.ItemView.extend({
+        tagName: 'li',
+        template: '#template-folder',
+        events: {
+        }
+    });
+
+    Views.FoldersView = Marionette.CollectionView.extend({
+        tagName: 'ul',
+        className: 'thumbnails',
+        itemView: Views.FolderView,
+        initialize: function() {
+        }
+    });
+
 });

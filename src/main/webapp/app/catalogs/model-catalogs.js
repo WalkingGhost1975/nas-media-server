@@ -27,4 +27,19 @@ NasMediaApp.module('Catalogs', function(Catalogs, App, Backbone, Marionette, $, 
             });
         }
     });
+
+    Catalogs.Node = Backbone.Model.extend({
+    });
+
+    Catalogs.NodeCollection = Backbone.Collection.extend({
+        model : Catalogs.Node
+    });
+
+    Catalogs.Folder = Backbone.Model.extend({
+    });
+
+    Catalogs.FolderCollection = Backbone.Collection.extend({
+        model : Catalogs.Folder
+    });
+
 });
