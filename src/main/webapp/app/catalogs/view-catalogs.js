@@ -14,7 +14,6 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             this.ui.item.addClass(className);
         },
         selectCatalog: function() {
-            this.model.trigger('clear:active');
             this.model.set({active: true});
         }
     });

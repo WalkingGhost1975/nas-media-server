@@ -35,18 +35,26 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
             this.displayMediaPlayer();
         },
         showMusic: function(catalog, path) {
-            this.model.set({'page': 'music', 'catalog': catalog, 'path': path});
+            this.model.catalogs = new App.Music.MusicCatalogCollection();
+            this._configureMediaModel('music',catalog, path);
             this.displayMediaPlayer();
         },
         showImages: function(catalog, path) {
-            this.model.set({'page': 'images', 'catalog': catalog, 'path': path});
+            this.model.catalogs = new App.Images.ImageCatalogCollection();
+            this._configureMediaModel('images',catalog, path);
             this.displayMediaPlayer();
         },
         displayMediaPlayer: function() {
             var page = this.model.get('page');
-            var layout = new this.pages[page];
-            layout.model = this.model;
+            var layout = new this.pages[page]({
+                model: this.model
+            });
             App.content.show(layout);
+        },
+        _configureMediaModel: function(page, catalog, path) {
+            this.model.set({'page': page, 'catalog': catalog, 'path': path});
+            this.model.listenTo(this.model.catalogs, 'change:active', this.model.syncFromCatalogCollection);
+            this.model.listenTo(this.model.catalogs, 'sync', this.model.syncToCatalogCollection);
         }
     };
 

@@ -15,10 +15,15 @@ NasMediaApp.module('Catalogs', function(Catalogs, App, Backbone, Marionette, $, 
 
     Catalogs.CatalogCollection = Backbone.Collection.extend({
         initialize : function()  {
-            this.on('clear:active', function()  {
-                this.each(function(catalog) {
-                    catalog.set({active:false},{silent:true});
-                });
+            this.on('change:active', function(model)  {
+                this.deselectCatalogs(model);
+            });
+        },
+        deselectCatalogs : function(activeCatalog) {
+            this.chain().reject(function(catalog)  {
+                return catalog === activeCatalog;
+            }).each(function(catalog) {
+                catalog.set({active:false},{silent:true});
             });
         }
     });

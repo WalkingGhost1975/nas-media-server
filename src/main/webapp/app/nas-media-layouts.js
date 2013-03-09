@@ -38,7 +38,7 @@ NasMediaApp.module('Layout', function(Layout, App, Backbone, Marionette, $, _) {
         },
         onRender: function() {
             this.$el.find('.carousel').carousel({
-                interval: 5000,
+                interval: 3000,
                 cycle: true
             });
         },
@@ -53,14 +53,15 @@ NasMediaApp.module('Layout', function(Layout, App, Backbone, Marionette, $, _) {
             content: '#content'
         },
         initialize: function() {
-            this.catalogCollection = new NasMediaApp.Music.MusicCatalogCollection();
-        },
-        onRender: function() {
-            var catalogsView = new NasMediaApp.Views.CatalogsView({
-                itemView: NasMediaApp.Views.MusicCatalogView,
-                collection: this.catalogCollection
+            //Prepare view
+            this.catalogsView = new App.Views.CatalogsView({
+                itemView: App.Views.MusicCatalogView,
+                collection: this.model.catalogs
             });
-            this.sidebar.show(catalogsView);
+        },
+
+        onRender: function() {
+            this.sidebar.show(this.catalogsView);
         }
     });
 
@@ -71,17 +72,16 @@ NasMediaApp.module('Layout', function(Layout, App, Backbone, Marionette, $, _) {
             content: '#content'
         },
         initialize: function() {
-            this.catalogCollection = new NasMediaApp.Images.ImageCatalogCollection();
+            this.contentView = new App.Views.ImagesView();
+
+            this.catalogsView = new App.Views.CatalogsView({
+                itemView: App.Views.ImageCatalogView,
+                collection: this.model.catalogs
+            });
         },
         onRender: function() {
-            var contentView = new NasMediaApp.Views.ImagesView();
-            this.content.show(contentView);
-
-            var catalogsView = new NasMediaApp.Views.CatalogsView({
-                itemView: NasMediaApp.Views.ImageCatalogView,
-                collection: this.catalogCollection
-            });
-            this.sidebar.show(catalogsView);
+            this.content.show(this.contentView);
+            this.sidebar.show(this.catalogsView);
         }
     });
 
