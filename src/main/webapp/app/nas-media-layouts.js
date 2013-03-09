@@ -50,6 +50,7 @@ NasMediaApp.module('Layout', function(Layout, App, Backbone, Marionette, $, _) {
         template: '#template-music-view',
         regions: {
             sidebar: '#sidebar',
+            breadcrumbs: '#breadcrumbs',
             content: '#content'
         },
         initialize: function() {
@@ -58,10 +59,14 @@ NasMediaApp.module('Layout', function(Layout, App, Backbone, Marionette, $, _) {
                 itemView: App.Views.MusicCatalogView,
                 collection: this.model.catalogs
             });
+            this.breadcrumbsView = new App.Views.BreadcrumbsView({
+                model: this.model
+            });
         },
 
         onRender: function() {
             this.sidebar.show(this.catalogsView);
+            this.breadcrumbs.show(this.breadcrumbsView);
         }
     });
 
@@ -69,6 +74,7 @@ NasMediaApp.module('Layout', function(Layout, App, Backbone, Marionette, $, _) {
         template: '#template-image-view',
         regions: {
             sidebar: '#sidebar',
+            breadcrumbs: '#breadcrumbs',
             content: '#content'
         },
         initialize: function() {
@@ -78,9 +84,13 @@ NasMediaApp.module('Layout', function(Layout, App, Backbone, Marionette, $, _) {
                 itemView: App.Views.ImageCatalogView,
                 collection: this.model.catalogs
             });
+            this.breadcrumbsView = new App.Views.BreadcrumbsView({
+                model: this.model
+            });
         },
         onRender: function() {
             this.content.show(this.contentView);
+            this.breadcrumbs.show(this.breadcrumbsView);
             this.sidebar.show(this.catalogsView);
         }
     });

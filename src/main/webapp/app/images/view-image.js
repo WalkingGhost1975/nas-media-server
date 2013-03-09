@@ -10,7 +10,6 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _){
       tagName : 'ul',
       className : 'thumbnails',
       itemView : Views.ImageView,
-      itemViewContainer : '#content',
   });
 });
 

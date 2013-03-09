@@ -7,13 +7,13 @@ NasMediaApp.module('Images', function(Images, App, Backbone, Marionette, $, _) {
         }
     });
 
-    Images.ImagesCatalog = NasMediaApp.Catalogs.Catalog.extend({
+    Images.ImagesCatalog = App.Catalogs.Catalog.extend({
         defaults: {
             category: 'images'
         }
     });
 
-    Images.ImageCatalogCollection = NasMediaApp.Catalogs.CatalogCollection.extend({
+    Images.ImageCatalogCollection = App.Catalogs.CatalogCollection.extend({
         url: 'repo/images',
         model: Images.ImagesCatalog
     });

@@ -29,4 +29,21 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             'change:active': 'render'
         }
     });
+
+    Views.BreadcrumbsView = Marionette.ItemView.extend({
+        tagName: 'ul',
+        className: 'breadcrumb',
+        template: '#template-breadcrumbs',
+        initialize: function() {
+            this.listenTo(this.model,'change',this.render);
+        },
+        events: {
+            'click a': 'selectPath'
+        },
+        selectPath: function(evt) {
+            var path = $(evt.currentTarget).data('path').substr(1);
+            this.model.set('path', path);
+        }
+    });
+
 });

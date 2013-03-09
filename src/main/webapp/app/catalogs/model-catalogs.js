@@ -6,9 +6,9 @@ NasMediaApp.module('Catalogs', function(Catalogs, App, Backbone, Marionette, $, 
             name: ''
         },
         initialize : function()  {
-            this.set({path : this.path()});
+            this.set({path : this._path()});
         },
-        path : function() {
+        _path : function() {
             return this.get('category') + "/" + this.get('name');
         }
     });

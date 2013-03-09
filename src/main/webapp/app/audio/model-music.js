@@ -7,13 +7,13 @@ NasMediaApp.module('Music', function(Music, App, Backbone, Marionette, $, _) {
         }
     });
 
-    Music.MusicCatalog = NasMediaApp.Catalogs.Catalog.extend({
+    Music.MusicCatalog = App.Catalogs.Catalog.extend({
         defaults: {
-            category: 'music'
+            category: 'audio'
         }
     });
 
-    Music.MusicCatalogCollection = NasMediaApp.Catalogs.CatalogCollection.extend({
+    Music.MusicCatalogCollection = App.Catalogs.CatalogCollection.extend({
         url: 'repo/audio',
         model: Music.MusicCatalog
     });

@@ -3,11 +3,11 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
     NasMediaController.Router = Marionette.AppRouter.extend({
         appRoutes: {
             'home': 'showHome',
-            'music': 'showMusic',
+            'audio': 'showMusic',
             'images': 'showImages',
-            'music/:catalog': 'showMusic',
+            'audio/:catalog': 'showMusic',
             'images/:catalog': 'showImages',
-            'music/:catalog/*musicPath': 'showMusic',
+            'audio/:catalog/*musicPath': 'showMusic',
             'images/:catalog/*imagePath': 'showImages'
         }
     });
@@ -15,7 +15,7 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
     controller = {
         pages: {
             'home': App.Layout.Home,
-            'music': App.Layout.Music,
+            'audio': App.Layout.Music,
             'images': App.Layout.Images
         },
         // Start the app by showing the appropriate views
@@ -36,7 +36,7 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
         },
         showMusic: function(catalog, path) {
             this.model.catalogs = new App.Music.MusicCatalogCollection();
-            this._configureMediaModel('music',catalog, path);
+            this._configureMediaModel('audio',catalog, path);
             this.displayMediaPlayer();
         },
         showImages: function(catalog, path) {
@@ -52,7 +52,10 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
             App.content.show(layout);
         },
         _configureMediaModel: function(page, catalog, path) {
-            this.model.set({'page': page, 'catalog': catalog, 'path': path});
+            //First set page and catalog
+            this.model.set({'page': page, 'catalog': catalog});
+            //Second set path
+            this.model.set({'path': path});
             this.model.listenTo(this.model.catalogs, 'change:active', this.model.syncFromCatalogCollection);
             this.model.listenTo(this.model.catalogs, 'sync', this.model.syncToCatalogCollection);
         }
