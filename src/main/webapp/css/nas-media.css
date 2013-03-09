@@ -1,4 +1,12 @@
 .row-fluid ul.thumbnails li.span2:nth-child(6n + 7) { margin-left : 0px; }
-.thumbnail {
-    height: 160px;
+a.thumbnail {
+    height: 136px;
+}
+div.thumbnail {
+    height: 180px;
+}
+
+.thumbnail .caption {
+    color: #555555;
+    padding: 0px 0px 0px 9px;
 }

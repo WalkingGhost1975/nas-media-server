@@ -11,8 +11,6 @@ NasMediaApp.module('Model', function(Model, App, Backbone, Marionette, $, _){
 
     initialize : function() {
         this.on('change:catalog', this._resetPath);
-        this.on('change:catalog', this._createBreadcrumbs);
-        this.on('change:path', this._createBreadcrumbs);
     },
 
     buildUrl : function()  {
@@ -47,7 +45,7 @@ NasMediaApp.module('Model', function(Model, App, Backbone, Marionette, $, _){
         this.set({catalog : this.getSelectedCatalog().get('name')});
     },
 
-    _createBreadcrumbs : function()  {
+    createBreadcrumbs : function()  {
         var breadcrumbs = [];
         if (this.has('catalog')) {
             var catalogCrumb = this._createBreadcrumb(this.get('catalog'), this.get('page') + '/' + this.get('catalog'), '/');

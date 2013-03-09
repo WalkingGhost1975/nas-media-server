@@ -8,21 +8,21 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             content: '#content'
         },
         initialize: function() {
+        },
+        onRender: function() {
             //Prepare view
-            this.catalogsView = new App.Views.CatalogsView({
+            var catalogsView = new App.Views.CatalogsView({
                 itemView: App.Views.AudioCatalogView,
                 collection: this.model.catalogs
             });
-            this.breadcrumbsView = new App.Views.BreadcrumbsView({
+            this.sidebar.show(catalogsView);
+
+            var breadcrumbsView = new App.Views.BreadcrumbsView({
                 model: this.model
             });
-        },
-        onRender: function() {
-            this.sidebar.show(this.catalogsView);
-            this.breadcrumbs.show(this.breadcrumbsView);
+            this.breadcrumbs.show(breadcrumbsView);
         }
     });
-
 
     Views.AudioFileView = Marionette.ItemView.extend({
         tagName: 'tr',

@@ -8,21 +8,23 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             content: '#content'
         },
         initialize: function() {
-            this.catalogsView = new Views.CatalogsView({
+        },
+        onRender: function() {
+            var catalogsView = new Views.CatalogsView({
                 itemView: App.Views.ImageCatalogView,
                 collection: this.model.catalogs
             });
-            this.breadcrumbsView = new Views.BreadcrumbsView({
+            this.sidebar.show(catalogsView);
+
+            var breadcrumbsView = new Views.BreadcrumbsView({
                 model: this.model
             });
-            this.contentView = new Views.ImagesLayout({
+            this.breadcrumbs.show(breadcrumbsView);
+
+            var contentView = new Views.ImagesLayout({
                 model: this.model
             });
-        },
-        onRender: function() {
-            this.breadcrumbs.show(this.breadcrumbsView);
-            this.sidebar.show(this.catalogsView);
-            this.content.show(this.contentView);
+            this.content.show(contentView);
         }
     });
 
@@ -33,7 +35,7 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             files: '#files'
         },
         initialize: function() {
-            this.listenTo(this.model, 'change:path', this.render);
+            this.listenTo(this.model, 'change', this.render);
         },
         onRender: function() {
             var self = this;

@@ -40,6 +40,9 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
         events: {
             'click a': 'selectPath'
         },
+        onBeforeRender : function() {
+            this.model.createBreadcrumbs();
+        },
         selectPath: function(evt) {
             var path = $(evt.currentTarget).data('path').substr(1);
             this.model.set('path', path);
@@ -60,5 +63,4 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
         initialize: function() {
         }
     });
-
 });

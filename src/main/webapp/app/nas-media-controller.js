@@ -21,7 +21,6 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
         // Start the app by showing the appropriate views
         start: function() {
             this.model = new App.Model.MediaModel();
-            this.showNavigation();
             this.displayMediaPlayer();
         },
         showNavigation: function() {
@@ -32,16 +31,19 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
         },
         showHome: function() {
             this.model.set({'page': 'home'});
+            this.showNavigation();
             this.displayMediaPlayer();
         },
         showAudio: function(catalog, path) {
             this.model.catalogs = new App.Audio.AudioCatalogCollection();
             this._configureMediaModel('audio',catalog, path);
+            this.showNavigation();
             this.displayMediaPlayer();
         },
         showImages: function(catalog, path) {
             this.model.catalogs = new App.Images.ImageCatalogCollection();
             this._configureMediaModel('images',catalog, path);
+            this.showNavigation();
             this.displayMediaPlayer();
         },
         displayMediaPlayer: function() {
@@ -52,10 +54,7 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
             App.content.show(layout);
         },
         _configureMediaModel: function(page, catalog, path) {
-            //First set page and catalog
-            this.model.set({'page': page, 'catalog': catalog});
-            //Second set path
-            this.model.set({'path': path});
+            this.model.set({'page': page, 'catalog': catalog,'path': path},{silent:true});
             this.model.listenTo(this.model.catalogs, 'change:active', this.model.syncFromCatalogCollection);
             this.model.listenTo(this.model.catalogs, 'sync', this.model.syncToCatalogCollection);
         }
