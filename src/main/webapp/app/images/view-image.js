@@ -1,7 +1,4 @@
 NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _){
-  Views.ImageCatalogView = Views.CatalogView.extend({
-      template : '#template-image-catalog'
-  });
 
   Views.ImageView = Marionette.ItemView.extend({
       tagName : 'li',
