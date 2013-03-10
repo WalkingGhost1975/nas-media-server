@@ -1,6 +1,6 @@
 NasMediaApp.module('Model', function(Model, App, Backbone, Marionette, $, _) {
 
-    Model.MediaModel = Backbone.Model.extend({
+    Model.LocationModel = Backbone.Model.extend({
         defaults: {
             page: 'home',
             catalog: '',
@@ -10,35 +10,13 @@ NasMediaApp.module('Model', function(Model, App, Backbone, Marionette, $, _) {
         initialize: function() {
             this.on('change:catalog', this._resetPath);
         },
+        buildHref: function() {
+            return this._buildPath();
+        },
         buildUrl: function() {
-            var url = 'repo/' + this.get('page');
-            if (this.has('catalog')) {
-                url += '/' + this.get('catalog');
-                if (this.has('path')) {
-                    url += '/' + this.get('path');
-                }
-            }
-            return url;
+            return this._buildPath('repo/');
         },
-        getSelectedCatalog: function() {
-            var selectedCatalog = this.catalogs.find(function(catalog) {
-                return catalog.get('active');
-            });
-            return selectedCatalog;
-        },
-        syncToCatalogCollection: function() {
-            var self = this;
-            var activeCatalog = this.catalogs.find(function(catalog) {
-                return catalog.get('name') === self.get('catalog');
-            });
-            if (activeCatalog) {
-                activeCatalog.set({active: true});
-            }
-        },
-        syncFromCatalogCollection: function() {
-            this.set({catalog: this.getSelectedCatalog().get('name')});
-        },
-        createBreadcrumbs: function() {
+        prepareBreadcrumbs: function() {
             var breadcrumbs = [];
             if (this.has('catalog')) {
                 var catalogCrumb = this._createBreadcrumb(this.get('catalog'), this.get('page') + '/' + this.get('catalog'), '/');
@@ -59,15 +37,26 @@ NasMediaApp.module('Model', function(Model, App, Backbone, Marionette, $, _) {
                     }
                 }
             }
-            this.set({'breadcrumbs': breadcrumbs});
-        },
-        _resetPath: function() {
-            this.set({'path': ''});
+            //Store breadcrumbs
+            this.set({breadcrumbs: breadcrumbs}, {silent: true});
         },
         _createBreadcrumb: function(name, href, path) {
             return {name: name, href: href, path: path};
         },
-        catalogs: new Backbone.Collection()
+        _buildPath: function(prefix) {
+            prefix = prefix || '';
+            var path = prefix + this.get('page');
+            if (this.has('catalog')) {
+                path += '/' + this.get('catalog');
+                if (this.has('path')) {
+                    path += '/' + this.get('path');
+                }
+            }
+            return path;
+        },
+        _resetPath: function() {
+            this.set({'path': ''});
+        }
     });
 
 });

@@ -14,7 +14,7 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             this.ui.item.addClass(className);
         },
         selectCatalog: function() {
-            this.model.set({active: true});
+            this.model.setActive();
         }
     });
 
@@ -27,6 +27,9 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
         },
         collectionEvents: {
             'change:active': 'render'
+        },
+        onBeforeRender: function() {
+            this.collection.syncActiveCatalog();
         }
     });
 
@@ -41,7 +44,7 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             'click a': 'selectPath'
         },
         onBeforeRender : function() {
-            this.model.createBreadcrumbs();
+            this.model.prepareBreadcrumbs();
         },
         selectPath: function(evt) {
             var path = $(evt.currentTarget).data('path').substr(1);

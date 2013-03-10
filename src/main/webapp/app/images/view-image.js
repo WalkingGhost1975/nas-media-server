@@ -7,11 +7,12 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             content: '#content'
         },
         initialize: function() {
+            this.catalogs = new App.Images.ImageCatalogCollection([],{location : this.model});
         },
         onRender: function() {
             var catalogsView = new Views.CatalogsView({
                 itemView: App.Views.ImageCatalogView,
-                collection: this.model.catalogs
+                collection: this.catalogs
             });
             this.sidebar.show(catalogsView);
 
@@ -33,37 +34,34 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             this.listenTo(this.model, 'change', this.render);
         },
         onRender: function() {
-            App.vent.trigger('display:overlay');
+            //Only render view a catalog is selected
             if (this.model.has('catalog')) {
                 var breadcrumbsView = new Views.BreadcrumbsView({
                     model: this.model
                 });
                 this.breadcrumbs.show(breadcrumbsView);
+
+                var self = this;
+                this.nodes = new App.Catalogs.NodeCollection();
+                this.nodes.url = this.model.buildUrl();
+                App.vent.trigger('display:overlay');
+                this.nodes.fetch({success: function(collection) {
+                        //Generate folders view
+                        var foldersViews = new Views.FoldersView({
+                            collection: self.nodes.getFolders({location: self.model})
+                        });
+                        self.folders.show(foldersViews);
+
+                        //Generate images view
+                        var files = new App.Images.ImageCatalogCollection([],{location: self.model})
+                        self.nodes.getMediaFiles(files, {location: self.model});
+                        var filesView = new Views.ImagesView({
+                            collection: files
+                        });
+                        self.files.show(filesView);
+                        App.vent.trigger('hide:overlay');
+                    }});
             }
-
-            var self = this;
-            this.model.mediaCollection = new App.Catalogs.NodeCollection();
-            this.model.mediaCollection.url = this.model.buildUrl();
-            this.model.mediaCollection.fetch({success: function(collection) {
-                    //Generate folders view
-                    var folders = collection.filter(function(node) {
-                        return node.get('@type') === 'Folder';
-                    });
-                    var foldersViews = new Views.FoldersView({
-                        collection: new App.Catalogs.FolderCollection(folders)
-                    });
-                    self.folders.show(foldersViews);
-
-                    //Generate images view
-                    var files = collection.filter(function(node) {
-                        return node.get('@type') === 'Image';
-                    });
-                    var filesView = new Views.ImagesView({
-                        collection: new App.Images.ImageCatalogCollection(files)
-                    });
-                    self.files.show(filesView);
-                    App.vent.trigger('hide:overlay');
-                }});
         }
     });
 

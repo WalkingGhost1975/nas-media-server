@@ -7,12 +7,13 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             content: '#content'
         },
         initialize: function() {
+            this.catalogs = new App.Audio.AudioCatalogCollection([],{location : this.model});
         },
         onRender: function() {
             //Prepare view
             var catalogsView = new App.Views.CatalogsView({
                 itemView: App.Views.AudioCatalogView,
-                collection: this.model.catalogs
+                collection: this.catalogs
             });
             this.sidebar.show(catalogsView);
         }
