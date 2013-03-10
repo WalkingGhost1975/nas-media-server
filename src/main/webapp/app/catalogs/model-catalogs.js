@@ -75,18 +75,20 @@ NasMediaApp.module('Catalogs', function(Catalogs, App, Backbone, Marionette, $, 
 
     Catalogs.Folder = Backbone.Model.extend({
         defaults : {
-            href : ''
+            href : '',
+            path : ''
         },
         initialize : function()  {
             if (!this.collection || !this.collection.location)  {
                 throw new Error('Collection with LocationModel required.');
             }
             this.location = this.collection.location;
-            this.set({'href' : this._buildHref()});
+            this.set({'href' : this.location.buildHref(this.get('name'))});
+            this.set({'path' : this.location.buildPath(this.get('name'))});
         },
-        _buildHref : function() {
-            var href = '#';
-            return href;
+        openFolder : function() {
+            var path = this.get('path');
+            this.location.set('path', path);
         }
     });
 

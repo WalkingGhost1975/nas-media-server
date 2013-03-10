@@ -59,6 +59,7 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             'click a': 'openFolder'
         },
         openFolder : function()  {
+            this.model.openFolder();
         }
     });
 

@@ -10,11 +10,21 @@ NasMediaApp.module('Model', function(Model, App, Backbone, Marionette, $, _) {
         initialize: function() {
             this.on('change:catalog', this._resetPath);
         },
-        buildHref: function() {
-            return this._buildPath();
+        buildPath: function(relativePath) {
+            var path = '';
+            if (this.has('path')) {
+                path += this.get('path') + '/';
+            }
+            if (relativePath)  {
+                path += relativePath;
+            }
+            return path;
         },
-        buildUrl: function() {
-            return this._buildPath('repo/');
+        buildHref: function(relativePath) {
+            return encodeURI(this._buildPath('', relativePath));
+        },
+        buildUrl: function(relativePath) {
+            return encodeURI(this._buildPath('repo/', relativePath));
         },
         prepareBreadcrumbs: function() {
             var breadcrumbs = [];
@@ -31,7 +41,7 @@ NasMediaApp.module('Model', function(Model, App, Backbone, Marionette, $, _) {
                         for (var i = 0; i < parts.length; i++) {
                             currentPath += '/' + parts[i];
                             currentHref += '/' + parts[i];
-                            var crumb = this._createBreadcrumb(parts[i], currentHref, currentPath);
+                            var crumb = this._createBreadcrumb(parts[i], encodeURI(currentHref), currentPath);
                             breadcrumbs.push(crumb);
                         }
                     }
@@ -43,14 +53,18 @@ NasMediaApp.module('Model', function(Model, App, Backbone, Marionette, $, _) {
         _createBreadcrumb: function(name, href, path) {
             return {name: name, href: href, path: path};
         },
-        _buildPath: function(prefix) {
+        _buildPath: function(prefix, relativePath) {
             prefix = prefix || '';
             var path = prefix + this.get('page');
             if (this.has('catalog')) {
                 path += '/' + this.get('catalog');
-                if (this.has('path')) {
-                    path += '/' + this.get('path');
+                if (this.has('path') && this.get('path').length > 0) {
+                    var locationPath = this.get('path');
+                    path += (locationPath.charAt(0) === '/' ? '' : '/') + locationPath;
                 }
+            }
+            if (relativePath)  {
+                path += '/' + relativePath;
             }
             return path;
         },

@@ -52,7 +52,7 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
             App.content.show(layout);
         },
         _setupLocationModel: function(page, catalog, path) {
-            this.model.set({'page': page, 'catalog': catalog,'path': path},{silent:true});
+            this.model.set({'page': decodeURI(page), 'catalog': decodeURI(catalog),'path': decodeURI(path)},{silent:true});
         }
     };
 

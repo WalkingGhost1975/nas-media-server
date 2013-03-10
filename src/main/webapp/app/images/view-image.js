@@ -7,7 +7,7 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             content: '#content'
         },
         initialize: function() {
-            this.catalogs = new App.Images.ImageCatalogCollection([],{location : this.model});
+            this.catalogs = new App.Images.ImageCatalogCollection([], {location: this.model});
         },
         onRender: function() {
             var catalogsView = new Views.CatalogsView({
@@ -53,7 +53,7 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
                         self.folders.show(foldersViews);
 
                         //Generate images view
-                        var files = new App.Images.ImageCatalogCollection([],{location: self.model});
+                        var files = new App.Images.ImageCatalogCollection([], {location: self.model});
                         self.nodes.getMediaFiles(files, {location: self.model});
                         var filesView = new Views.ImagesView({
                             collection: files
