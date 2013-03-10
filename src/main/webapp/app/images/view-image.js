@@ -45,7 +45,7 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
                 this.nodes = new App.Catalogs.NodeCollection();
                 this.nodes.url = this.model.buildUrl();
                 App.vent.trigger('display:overlay');
-                this.nodes.fetch({success: function(collection) {
+                this.nodes.fetch({success: function() {
                         //Generate folders view
                         var foldersViews = new Views.FoldersView({
                             collection: self.nodes.getFolders({location: self.model})
@@ -53,7 +53,7 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
                         self.folders.show(foldersViews);
 
                         //Generate images view
-                        var files = new App.Images.ImageCatalogCollection([],{location: self.model})
+                        var files = new App.Images.ImageCatalogCollection([],{location: self.model});
                         self.nodes.getMediaFiles(files, {location: self.model});
                         var filesView = new Views.ImagesView({
                             collection: files
@@ -74,7 +74,7 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
     Views.ImagesView = Marionette.CollectionView.extend({
         tagName: 'ul',
         className: 'thumbnails',
-        itemView: Views.ImageView,
+        itemView: Views.ImageView
     });
 });
 
