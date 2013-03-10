@@ -53,6 +53,9 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
         tagName: 'li',
         template: '#template-folder',
         events: {
+            'click a': 'openFolder'
+        },
+        openFolder : function()  {
         }
     });
 

@@ -21,7 +21,7 @@ NasMediaApp.module('NasMediaController', function(NasMediaController, App, Backb
         // Start the app by showing the appropriate views
         start: function() {
             this.model = new App.Model.MediaModel();
-            this.displayMediaPlayer();
+            this.showHome();
         },
         showNavigation: function() {
             var navLayout = new App.Layout.Navigation({
