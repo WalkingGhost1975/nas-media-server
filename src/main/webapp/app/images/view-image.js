@@ -4,7 +4,6 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
         template: '#template-image-page-layout',
         regions: {
             sidebar: '#sidebar',
-            breadcrumbs: '#breadcrumbs',
             content: '#content'
         },
         initialize: function() {
@@ -16,11 +15,6 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             });
             this.sidebar.show(catalogsView);
 
-            var breadcrumbsView = new Views.BreadcrumbsView({
-                model: this.model
-            });
-            this.breadcrumbs.show(breadcrumbsView);
-
             var contentView = new Views.ImagesLayout({
                 model: this.model
             });
@@ -31,6 +25,7 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
     Views.ImagesLayout = Marionette.Layout.extend({
         template: '#template-image-content-layout',
         regions: {
+            breadcrumbs: '#breadcrumbs',
             folders: '#folders',
             files: '#files'
         },
@@ -38,6 +33,14 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
             this.listenTo(this.model, 'change', this.render);
         },
         onRender: function() {
+            App.vent.trigger('display:overlay');
+            if (this.model.has('catalog')) {
+                var breadcrumbsView = new Views.BreadcrumbsView({
+                    model: this.model
+                });
+                this.breadcrumbs.show(breadcrumbsView);
+            }
+
             var self = this;
             this.model.mediaCollection = new App.Catalogs.NodeCollection();
             this.model.mediaCollection.url = this.model.buildUrl();
@@ -59,6 +62,7 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
                         collection: new App.Images.ImageCatalogCollection(files)
                     });
                     self.files.show(filesView);
+                    App.vent.trigger('hide:overlay');
                 }});
         }
     });

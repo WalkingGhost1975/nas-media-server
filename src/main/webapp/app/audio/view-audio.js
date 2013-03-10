@@ -4,7 +4,6 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
         template: '#template-audio-page-layout',
         regions: {
             sidebar: '#sidebar',
-            breadcrumbs: '#breadcrumbs',
             content: '#content'
         },
         initialize: function() {
@@ -16,11 +15,6 @@ NasMediaApp.module('Views', function(Views, App, Backbone, Marionette, $, _) {
                 collection: this.model.catalogs
             });
             this.sidebar.show(catalogsView);
-
-            var breadcrumbsView = new App.Views.BreadcrumbsView({
-                model: this.model
-            });
-            this.breadcrumbs.show(breadcrumbsView);
         }
     });
 
