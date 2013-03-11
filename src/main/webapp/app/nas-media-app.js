@@ -15,7 +15,7 @@ NasMediaApp.vent.on("display:overlay", function() {
     NasMediaApp.overlayHandler.push(window.setTimeout(function() {
         $('#overlay').fadeIn(500);
         $('#overlay').spin('large','grey');
-    },500));
+    },1000));
 });
 
 NasMediaApp.vent.on("hide:overlay", function() {
