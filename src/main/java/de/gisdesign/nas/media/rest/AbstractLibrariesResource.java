@@ -61,7 +61,7 @@ public abstract class AbstractLibrariesResource<M extends MediaFileData> {
         AbstractLibraryResource<M> libraryResource = null;
         if (library != null) {
             libraryResource = createLibraryResource(library, uriInfo);
-            LOG.debug("Created AudioLibraryResource for MediaFileLibrary [{}].", libraryName);
+            LOG.debug("Created AbstractLibraryResource for MediaFileLibrary [{}].", libraryName);
         } else {
             LOG.warn("MediaFileLibrary [{}] unknown.", libraryName);
         }

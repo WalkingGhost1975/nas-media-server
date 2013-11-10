@@ -69,9 +69,9 @@ public abstract class AbstractLibraryResource<M extends MediaFileData> {
         for (MediaRootDirectory mediaRootDirectory : mediaLibrary.getRootDirectories()) {
             File rootDirectory = mediaRootDirectory.getDirectory();
             if (rootDirectory.exists() && rootDirectory.isDirectory())  {
-                LOG.debug("Creating MediaDirectoryCatalogEntry for root directory [{}] of MediaFileLibrary [{}].", rootDirectory.getAbsoluteFile(), mediaLibrary.getName());
+                LOG.debug("Creating MediaDirectoryCatalogEntry [{}] for root directory [{}] of MediaFileLibrary [{}].", mediaRootDirectory.getName(), rootDirectory.getAbsoluteFile(), mediaLibrary.getName());
                 libraryFolders.put(mediaRootDirectory.getName(), new MediaDirectoryCatalogEntry<M>(this.mediaRepository, null, rootDirectory));
-                LOG.debug("Created MediaDirectoryCatalogEntry for root directory [{}] of MediaFileLibrary [{}] successfully.", rootDirectory.getAbsoluteFile(), mediaLibrary.getName());
+                LOG.debug("Created MediaDirectoryCatalogEntry [{}] for root directory [{}] of MediaFileLibrary [{}] successfully.", mediaRootDirectory.getName(), rootDirectory.getAbsoluteFile(), mediaLibrary.getName());
             } else {
                 LOG.error("Skipping invalid root directory [{}] of MediaFileLibrary [{}].", rootDirectory.getAbsolutePath(), mediaLibrary.getName());
             }
@@ -99,7 +99,7 @@ public abstract class AbstractLibraryResource<M extends MediaFileData> {
         CatalogEntryFolderResource folderResource = null;
         if (rootFolderCatalogEntry != null)  {
             folderResource = new CatalogEntryFolderResource(createCatalogEntryResourceBuilder(), rootFolderCatalogEntry, uriInfo);
-            LOG.debug("Created AudioFolderResource for root folder [{}] with ID [{}]", rootFolderCatalogEntry.getName(), id);
+            LOG.debug("Created CatalogEntryFolderResource for root folder [{}] with ID [{}]", rootFolderCatalogEntry.getName(), id);
         } else {
             LOG.warn("No root folder with ID [{}] found.", id);
         }

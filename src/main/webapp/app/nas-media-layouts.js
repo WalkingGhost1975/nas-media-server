@@ -41,6 +41,7 @@ NasMediaApp.module('Layout', function(Layout, App, Backbone, Marionette, $, _) {
                 interval: 3000,
                 cycle: true
             });
+            App.vent.trigger('hide:overlay');
         },
         events: {
         }
